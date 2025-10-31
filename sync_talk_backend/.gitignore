@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+uploads
+.env
+.DS_Store
+\nnode_modules/\n.dart_tool/\nbuild/\n.idea/\n.vscode/\n.DS_Store\n.env\n.env.*\nuploads/\n

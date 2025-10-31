@@ -1,0 +1,51 @@
+# -----------------------
+# Global ignores
+# -----------------------
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+dist/
+.env
+.env.*
+*.iml
+*.lock
+.idea/
+.vscode/
+coverage/
+
+# -----------------------
+# Flutter / Dart ignores
+# -----------------------
+**/build/
+**/.dart_tool/
+**/.packages
+**/pubspec.lock
+**/ios/Flutter/.symlinks/
+**/ios/Pods/
+**/android/.gradle/
+**/android/app/build/
+**/android/local.properties
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+
+# -----------------------
+# Firebase & credentials
+# -----------------------
+google-services.json
+GoogleService-Info.plist
+firebase.json
+
+# -----------------------
+# Postman / temp / uploads
+# -----------------------
+uploads/
+postman/
+
+sync_talk_mobile/build/
+# Flutter / Android builds
+**/build/
+.android/
+.gradle/
+*.iml
+.idea/

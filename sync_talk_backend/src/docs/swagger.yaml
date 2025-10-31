@@ -1,0 +1,30 @@
+  /conversations:
+    get:
+      summary: My conversations
+      tags: [Conversations]
+
+  /conversations/private:
+    post:
+      summary: Get or create private chat
+      tags: [Conversations]
+
+  /messages/{conversationId}:
+    get:
+      summary: Get messages (paginated)
+      tags: [Messages]
+      parameters:
+        - in: path
+          name: conversationId
+          required: true
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: limit
+          schema: { type: integer }
+
+  /messages:
+    post:
+      summary: Send message (HTTP)
+      tags: [Messages]

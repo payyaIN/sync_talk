@@ -1,0 +1,1 @@
+export class HttpError extends Error { status:number; details?:any; constructor(s:number,m:string,d?:any){super(m);this.status=s;this.details=d;} }
