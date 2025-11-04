@@ -618,7 +618,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/services/dio_client.dart';
+import 'package:sync_talk_mobile/core/services/api.dart' as ApiClient;
 import '../../../core/services/socket_service.dart';
 import '../../../core/widgets/chat_header.dart';
 import '../../auth/viewmodel/auth_providers.dart';

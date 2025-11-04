@@ -92,7 +92,6 @@ final appRouter = GoRouter(
     final container = ProviderScope.containerOf(context);
     final user = container.read(authStateProvider);
     final loggingIn = state.subloc == '/login' || state.subloc == '/register';
-
     if (user == null && !loggingIn && state.subloc != '/splash') {
       return '/login';
     }

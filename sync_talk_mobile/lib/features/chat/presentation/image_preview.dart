@@ -17,7 +17,7 @@ class ImagePreview extends StatelessWidget {
       body: Center(
         child: PhotoView(
           imageProvider: NetworkImage(imageUrl),
-          loadingBuilder: (_) => const CircularProgressIndicator(),
+          loadingBuilder: (context, event) => const CircularProgressIndicator(),
         ),
       ),
     );

@@ -298,7 +298,7 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
     if (ids == null || ids.isEmpty) return;
 
     final dio = Dio();
-    final token = await TokenStore.read();
+    final token = await SecureTokenStore.read();
     await dio.post(
       "${AppEnv.apiBaseUrl}/groups/members/add",
       data: {"conversationId": widget.conversation["_id"], "members": ids},
@@ -309,7 +309,7 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
 
   Future<void> _removeMember(String userId) async {
     final dio = Dio();
-    final token = await TokenStore.read();
+    final token = await SecureTokenStore.read();
     await dio.post(
       "${AppEnv.apiBaseUrl}/groups/members/remove",
       data: {"conversationId": widget.conversation["_id"], "userId": userId},
@@ -320,7 +320,7 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
 
   Future<void> _leaveGroup() async {
     final dio = Dio();
-    final token = await TokenStore.read();
+    final token = await SecureTokenStore.read();
     await dio.post(
       "${AppEnv.apiBaseUrl}/groups/leave",
       data: {"conversationId": widget.conversation["_id"]},

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sync_talk_mobile/features/chat/presentation/chat_screen.dart';
 import '../viewmodel/chat_viewmodel.dart';
-import 'chat_screen.dart';
 
 class UserSearchScreen extends ConsumerWidget {
   UserSearchScreen({super.key});

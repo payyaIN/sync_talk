@@ -210,6 +210,23 @@ io.on("connection", (socket) => {
     });
   });
 
+  // Emit events to admin namespace
+io.of('/admin').on('connection', (socket) => {
+  console.log('Admin connected:', socket.id);
+  
+  // Send real-time stats every 10 seconds
+  const interval = setInterval(() => {
+    socket.emit('stats:update', {
+      activeUsers: onlineUsers.size,
+      timestamp: new Date(),
+    });
+  }, 10000);
+  
+  socket.on('disconnect', () => {
+    clearInterval(interval);
+  });
+});
+
   socket.on("disconnect", async () => {
     const userId = [...onlineUsers.entries()].find(([_, id]) => id === socket.id)?.[0];
     if (userId) {
@@ -241,6 +258,7 @@ io.on("connection", (socket) => {
       createdAt: new Date(),
     });
   });
+  
 });
 
 server.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
