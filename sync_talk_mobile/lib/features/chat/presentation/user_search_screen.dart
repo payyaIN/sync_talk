@@ -33,11 +33,18 @@ class UserSearchScreen extends ConsumerWidget {
                   final convo = await ref
                       .read(chatViewModelProvider)
                       .startPrivateChat(results[i]["_id"]);
-                  // ignore: use_build_context_synchronously
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (_) => ChatScreen(conversation: convo),
+                  //   ),
+                  // );
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ChatScreen(conversation: convo),
+                      builder: (_) => ChatScreen(
+                        conversationId: convo['id'],
+                      ), // Use 'conversationId' and extract ID
                     ),
                   );
                 },

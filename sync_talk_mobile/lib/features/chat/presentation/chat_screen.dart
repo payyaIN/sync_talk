@@ -719,10 +719,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final myId = ref.watch(currentUserIdProvider);
 
     return Scaffold(
+      // appBar: ChatHeader(
+      //   title: chatTitle,
+      //   isOnline: isOnline,
+      //   lastSeen: lastSeen,
+      // ),
       appBar: ChatHeader(
         title: chatTitle,
-        isOnline: isOnline,
-        lastSeen: lastSeen,
+        subtitle: isOnline
+            ? "Online"
+            : (lastSeen != null ? "Last seen $lastSeen" : null),
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())

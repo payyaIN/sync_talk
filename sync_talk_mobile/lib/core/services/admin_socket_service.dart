@@ -5,7 +5,7 @@ class AdminSocketService {
 
   static void connect(String adminToken) {
     _socket = IO.io(
-      'http://localhost:4000',
+      'http://192.168.1.8:4000',
       IO.OptionBuilder().setTransports(['websocket']).setAuth({
         'token': adminToken,
       }).build(),
