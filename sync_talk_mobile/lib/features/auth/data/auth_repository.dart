@@ -247,58 +247,105 @@ import 'package:dio/dio.dart';
 import '../../../core/services/api.dart';
 import '../../../core/services/session.dart';
 
-class AuthRepository {
-  final Dio _dio = dio;
+// class AuthRepository {
+//   final Dio _dio = dio;
 
-  /// Register new user with backend
-  Future<Map<String, dynamic>> register({
+//   /// Register new user with backend
+//   Future<Map<String, dynamic>> register({
+//     required String name,
+//     required String email,
+//     required String password,
+//   }) async {
+//     try {
+//       final response = await _dio.post(
+//         '/auth/register',
+//         data: {'displayName': name, 'email': email, 'password': password},
+//       );
+
+//       return response.data;
+//     } on DioException catch (e) {
+//       throw _handleError(e);
+//     }
+//   }
+
+/// Login with email/password
+// Future<Map<String, dynamic>> login({
+//   required String email,
+//   required String password,
+// }) async {
+//   try {
+//     final response = await _dio.post(
+//       '/auth/login',
+//       data: {'email': email, 'password': password},
+//     );
+
+//     final data = response.data;
+
+//     // Store tokens
+//     if (data['accessToken'] != null) {
+//       await session.setAccessToken(data['accessToken']);
+//     }
+//     if (data['refreshToken'] != null) {
+//       await session.setRefreshToken(data['refreshToken']);
+//     }
+
+//     // Store user info
+//     if (data['user'] != null) {
+//       await session.setUserId(data['user']['id']);
+//       await session.setUser(data['user']);
+//     }
+
+//     return data;
+//   } on DioException catch (e) {
+//     throw _handleError(e);
+//   }
+// }
+class AuthRepository {
+  final Dio _dio = api;
+
+  Future<void> register({
     required String name,
     required String email,
     required String password,
   }) async {
-    try {
-      final response = await _dio.post(
-        '/auth/register',
-        data: {'displayName': name, 'email': email, 'password': password},
-      );
+    final resp = await _dio.post(
+      '/auth/register',
+      data: {'displayName': name, 'email': email, 'password': password},
+    );
 
-      return response.data;
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
+    await session.setTokens(
+      resp.data['accessToken'],
+      resp.data['refreshToken'],
+    );
+    session.userId = resp.data['user']['id'];
+    await session.save();
   }
 
-  /// Login with email/password
-  Future<Map<String, dynamic>> login({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      final response = await _dio.post(
-        '/auth/login',
-        data: {'email': email, 'password': password},
-      );
+  Future<void> login({required String email, required String password}) async {
+    final resp = await _dio.post(
+      '/auth/login',
+      data: {'email': email, 'password': password},
+    );
 
-      final data = response.data;
+    await session.setTokens(
+      resp.data['accessToken'],
+      resp.data['refreshToken'],
+    );
+    session.userId = resp.data['user']['id'];
+    await session.save();
+  }
 
-      // Store tokens
-      if (data['accessToken'] != null) {
-        await session.setAccessToken(data['accessToken']);
-      }
-      if (data['refreshToken'] != null) {
-        await session.setRefreshToken(data['refreshToken']);
-      }
-
-      // Store user info
-      if (data['user'] != null) {
-        await session.setUserId(data['user']['id']);
-        await session.setUser(data['user']);
-      }
-
-      return data;
-    } on DioException catch (e) {
-      throw _handleError(e);
+  Future<Map<String, dynamic>> currentUser() async {
+    if (session.accessToken == null) {
+      throw Exception('Not logged in');
     }
+
+    final resp = await _dio.get('/users/me');
+    return resp.data;
+  }
+
+  Future<void> logout() async {
+    await session.clear();
   }
 
   /// Login with Google OAuth
@@ -358,25 +405,25 @@ class AuthRepository {
   }
 
   /// Get current user info
-  Future<Map<String, dynamic>> getCurrentUser() async {
-    try {
-      final response = await _dio.get('/users/me');
-      final user = response.data;
+  // Future<Map<String, dynamic>> getCurrentUser() async {
+  //   try {
+  //     final response = await _dio.get('/users/me');
+  //     final user = response.data;
 
-      if (user != null) {
-        await session.setUser(user);
-      }
+  //     if (user != null) {
+  //       await session.setUser(user);
+  //     }
 
-      return user;
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
-  }
+  //     return user;
+  //   } on DioException catch (e) {
+  //     throw _handleError(e);
+  //   }
+  // }
 
   /// Logout
-  Future<void> logout() async {
-    await session.clear();
-  }
+  // Future<void> logout() async {
+  //   await session.clear();
+  // }
 
   /// Check if user is logged in
   Future<bool> isLoggedIn() async {

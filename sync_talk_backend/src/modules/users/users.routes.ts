@@ -1,6 +1,6 @@
 
 import { Router } from 'express';
-import { requireAuth, AuthedRequest, requireAdmin } from '../../core/middleware/auth.js';
+import { requireAuth, AuthedRequest, requireAdmin } from '../../middleware/auth.js';
 import { User } from './user.model.js';
 import { Audit } from '../audit/audit.model.js';
 

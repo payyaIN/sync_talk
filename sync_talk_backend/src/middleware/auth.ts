@@ -17,7 +17,10 @@
 
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { cfg } from "../config/env.js";
+// import { cfg } from "../config/env.js";
+import { config } from "../config/env.js";
+
+// import { requireAuth, AuthedRequest } from '../../middleware/auth';
 
 export interface AuthedRequest extends Request {
   user?: { userId: string; role?: string; [k: string]: any };
@@ -28,7 +31,8 @@ export function requireAuth(req: AuthedRequest, res: Response, next: NextFunctio
   if (!h) return res.status(401).json({ message: "Missing Authorization" });
   const token = h.replace("Bearer ", "").trim();
   try {
-    const payload = jwt.verify(token, cfg.jwtSecret as string) as any;
+    // const payload = jwt.verify(token, cfg.jwtSecret as string) as any;
+    const payload = jwt.verify(token, config.jwt.accessSecret as string) as any;
     req.user = payload;
     return next();
   } catch (err) {

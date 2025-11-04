@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import { Message } from "./message.model";
 import { Conversation } from "../conversations/conversation.model";
-import { successResponse, errorResponse } from "../../utils/response";
+// import { successResponse, errorResponse } from "../../utils/response";
+import { success as successResponse, fail as errorResponse } from "../../utils/response";
 import { AuthRequest } from "../../middleware/auth.middleware";
 
 // Guard: ensure user is a participant

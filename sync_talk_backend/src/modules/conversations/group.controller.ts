@@ -16,6 +16,10 @@ export const addMembers = async (req: AuthRequest, res: Response) => {
   const group = await Conversation.findById(conversationId);
   if (!group || !group.isGroup) return res.status(404).json({ message: "Group not found" });
 
+ if (!group.admins || group.admins.length === 0) {
+    return res.status(500).json({ message: "Group has no admins" });
+  }
+
   const me = new mongoose.Types.ObjectId(req.user!.userId);
   const isAdmin = group.admins.some(a => a.toString() === me.toString());
   if (!isAdmin) return res.status(403).json({ message: "Only admins can add members" });
@@ -33,6 +37,10 @@ export const removeMember = async (req: AuthRequest, res: Response) => {
   const group = await Conversation.findById(conversationId);
   if (!group || !group.isGroup) return res.status(404).json({ message: "Group not found" });
 
+ if (!group.admins || group.admins.length === 0) {
+    return res.status(500).json({ message: "Group has no admins" });
+  }
+
   const me = req.user!.userId;
   const isAdmin = group.admins.some(a => a.toString() === me);
   if (!isAdmin) return res.status(403).json({ message: "Only admins can remove members" });
@@ -48,6 +56,10 @@ export const leaveGroup = async (req: AuthRequest, res: Response) => {
   const { conversationId } = req.body;
   const group = await Conversation.findById(conversationId);
   if (!group || !group.isGroup) return res.status(404).json({ message: "Group not found" });
+
+ if (!group.admins || group.admins.length === 0) {
+    return res.status(500).json({ message: "Group has no admins" });
+  }
 
   const me = req.user!.userId;
   group.participants = group.participants.filter(p => p.toString() !== me);

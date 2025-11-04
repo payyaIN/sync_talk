@@ -435,108 +435,108 @@
 //   }
 // }
 
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:go_router/go_router.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
-  @override
-  ConsumerState<LoginScreen> createState() => _LoginState();
-}
+// class LoginScreen extends ConsumerStatefulWidget {
+//   const LoginScreen({super.key});
+//   @override
+//   ConsumerState<LoginScreen> createState() => _LoginState();
+// }
 
-class _LoginState extends ConsumerState<LoginScreen> {
-  final email = TextEditingController(text: 'test@example.com');
-  final pass = TextEditingController(text: 'Passw0rd!');
-  bool loading = false;
-  String? error;
+// class _LoginState extends ConsumerState<LoginScreen> {
+//   final email = TextEditingController(text: 'test@example.com');
+//   final pass = TextEditingController(text: 'Passw0rd!');
+//   bool loading = false;
+//   String? error;
 
-  Future<void> _doLogin() async {
-    setState(() {
-      loading = true;
-      error = null;
-    });
-    try {
-      await ref.read(apiProvider).login(email.text.trim(), pass.text);
-      if (mounted) context.go('/home');
-    } catch (e, st) {
-      debugPrint('LOGIN ERROR: $e');
-      debugPrintStack(stackTrace: st);
-      setState(() => error = e.toString().replaceFirst('Exception: ', ''));
-    } finally {
-      if (mounted) setState(() => loading = false);
-    }
-  }
+//   Future<void> _doLogin() async {
+//     setState(() {
+//       loading = true;
+//       error = null;
+//     });
+//     try {
+//       await ref.read(apiProvider).login(email.text.trim(), pass.text);
+//       if (mounted) context.go('/home');
+//     } catch (e, st) {
+//       debugPrint('LOGIN ERROR: $e');
+//       debugPrintStack(stackTrace: st);
+//       setState(() => error = e.toString().replaceFirst('Exception: ', ''));
+//     } finally {
+//       if (mounted) setState(() => loading = false);
+//     }
+//   }
 
-  Future<void> _doRegister() async {
-    setState(() {
-      loading = true;
-      error = null;
-    });
-    try {
-      await ref.read(apiProvider).register(email.text.trim(), pass.text);
-      await ref.read(apiProvider).login(email.text.trim(), pass.text);
-      if (mounted) context.go('/home');
-    } catch (e, st) {
-      debugPrint('REGISTER ERROR: $e');
-      debugPrintStack(stackTrace: st);
-      setState(() => error = e.toString().replaceFirst('Exception: ', ''));
-    } finally {
-      if (mounted) setState(() => loading = false);
-    }
-  }
+//   Future<void> _doRegister() async {
+//     setState(() {
+//       loading = true;
+//       error = null;
+//     });
+//     try {
+//       await ref.read(apiProvider).register(email.text.trim(), pass.text);
+//       await ref.read(apiProvider).login(email.text.trim(), pass.text);
+//       if (mounted) context.go('/home');
+//     } catch (e, st) {
+//       debugPrint('REGISTER ERROR: $e');
+//       debugPrintStack(stackTrace: st);
+//       setState(() => error = e.toString().replaceFirst('Exception: ', ''));
+//     } finally {
+//       if (mounted) setState(() => loading = false);
+//     }
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('SyncTalk Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: email,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: pass,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 12),
-            if (error != null)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red.withOpacity(0.3)),
-                ),
-                child: Text(error!, style: const TextStyle(color: Colors.red)),
-              ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: loading ? null : _doLogin,
-                    child: Text(loading ? 'Please wait...' : 'Login'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: loading ? null : _doRegister,
-                    child: const Text('Register'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('SyncTalk Login')),
+//       body: Padding(
+//         padding: const EdgeInsets.all(16),
+//         child: Column(
+//           children: [
+//             TextField(
+//               controller: email,
+//               decoration: const InputDecoration(labelText: 'Email'),
+//             ),
+//             const SizedBox(height: 12),
+//             TextField(
+//               controller: pass,
+//               decoration: const InputDecoration(labelText: 'Password'),
+//               obscureText: true,
+//             ),
+//             const SizedBox(height: 12),
+//             if (error != null)
+//               Container(
+//                 width: double.infinity,
+//                 padding: const EdgeInsets.all(12),
+//                 decoration: BoxDecoration(
+//                   color: Colors.red.withOpacity(0.1),
+//                   borderRadius: BorderRadius.circular(8),
+//                   border: Border.all(color: Colors.red.withOpacity(0.3)),
+//                 ),
+//                 child: Text(error!, style: const TextStyle(color: Colors.red)),
+//               ),
+//             const SizedBox(height: 12),
+//             Row(
+//               children: [
+//                 Expanded(
+//                   child: ElevatedButton(
+//                     onPressed: loading ? null : _doLogin,
+//                     child: Text(loading ? 'Please wait...' : 'Login'),
+//                   ),
+//                 ),
+//                 const SizedBox(width: 12),
+//                 Expanded(
+//                   child: OutlinedButton(
+//                     onPressed: loading ? null : _doRegister,
+//                     child: const Text('Register'),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

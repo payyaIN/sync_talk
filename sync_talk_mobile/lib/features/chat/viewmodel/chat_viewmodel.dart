@@ -48,6 +48,17 @@ class ChatViewModel {
       ref.read(messageListProvider.notifier).state = msgs;
     }
   }
+
+  // ADD these methods:
+  Future<List<dynamic>> searchUsers(String query) async {
+    final results = await ref.read(chatRepositoryProvider).searchUsers(query);
+    ref.read(searchResultsProvider.notifier).state = results;
+    return results;
+  }
+
+  Future<Map<String, dynamic>> startPrivateChat(String userId) async {
+    return await ref.read(chatRepositoryProvider).createConversation(userId);
+  }
 }
 
 final chatViewModelProvider = Provider((ref) => ChatViewModel(ref));

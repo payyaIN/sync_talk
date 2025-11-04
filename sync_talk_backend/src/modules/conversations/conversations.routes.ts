@@ -12,7 +12,7 @@
 
 
 import { Router } from 'express';
-import { requireAuth, AuthedRequest } from '../../core/middleware/auth.js';
+import { requireAuth, AuthedRequest } from '../../middleware/auth.js';
 import { z } from 'zod';
 import { Conversation } from './conversation.model.js';
 

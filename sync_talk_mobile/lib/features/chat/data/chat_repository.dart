@@ -83,6 +83,23 @@ class ChatRepo {
     );
     return res.data['data'];
   }
+
+  // ADD these methods:
+  Future<List<dynamic>> searchUsers(String query) async {
+    final resp = await dio.get('/users/search', queryParameters: {'q': query});
+    return resp.data as List;
+  }
+
+  Future<Map<String, dynamic>> createConversation(String userId) async {
+    final resp = await dio.post(
+      '/conversations',
+      data: {
+        'participants': [userId],
+        'isGroup': false,
+      },
+    );
+    return resp.data;
+  }
 }
 // final chatRepositoryProvider = Provider((ref) => ChatRepository());
 

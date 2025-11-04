@@ -15,7 +15,7 @@
   "include": [
     "src/**/*.ts",
     "src/*.ts"
-  ],
+, "src/middleware/auth.ts"  ],
   "exclude": [
     "node_modules",
     "dist"

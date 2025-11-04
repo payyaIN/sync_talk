@@ -1,8 +1,9 @@
-import mongoose, { Schema, Document } from "mongoose";
+// import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IBlocked extends Document {
-  blocker: string;
-  blocked: string;
+  blocker: Types.ObjectId;
+  blocked: Types.ObjectId;
 }
 
 const BlockSchema = new Schema<IBlocked>(

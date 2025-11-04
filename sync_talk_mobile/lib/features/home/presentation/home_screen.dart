@@ -149,6 +149,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/services/api.dart';
 import '../../../core/services/session.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:dio/dio.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

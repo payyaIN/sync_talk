@@ -15,7 +15,7 @@ export const deleteMessage = async (req: AuthRequest, res: Response) => {
     if (msg.sender.toString() !== req.user!.userId)
       return res.status(403).json({ message: "Not allowed" });
 
-    msg.message = "🗑️ message deleted";
+    msg.content = "🗑️ message deleted";
     await msg.save();
 
     return res.json({ message: "Message deleted" });

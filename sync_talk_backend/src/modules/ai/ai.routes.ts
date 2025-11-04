@@ -1,6 +1,6 @@
 
 import { Router } from 'express';
-import { requireAuth } from '../../core/middleware/auth.js';
+import { requireAuth } from '../../middleware/auth.js';
 import { z } from 'zod';
 import { config } from '../../config/env.js';
 export const aiRouter = Router();

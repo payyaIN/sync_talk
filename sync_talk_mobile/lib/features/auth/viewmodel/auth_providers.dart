@@ -25,6 +25,12 @@ final authStateProvider = StateProvider<Map<String, dynamic>?>(
 final authLoadingProvider = StateProvider<bool>((ref) => false);
 final authErrorProvider = StateProvider<String?>((ref) => null);
 
+// ADD this provider:
+final currentUserIdProvider = Provider<String?>((ref) {
+  final user = ref.watch(authStateProvider);
+  return user?['id'];
+});
+
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import '../data/auth_repository.dart';
 

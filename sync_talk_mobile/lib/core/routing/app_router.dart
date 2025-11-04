@@ -91,8 +91,10 @@ final appRouter = GoRouter(
   redirect: (context, state) {
     final container = ProviderScope.containerOf(context);
     final user = container.read(authStateProvider);
-    final loggingIn = state.subloc == '/login' || state.subloc == '/register';
-    if (user == null && !loggingIn && state.subloc != '/splash') {
+    final loggingIn =
+        state.matchedLocation == '/login' ||
+        state.matchedLocation == '/register';
+    if (user == null && !loggingIn && state.matchedLocation != '/splash') {
       return '/login';
     }
     if (user != null && loggingIn) return '/home';

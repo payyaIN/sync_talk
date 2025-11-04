@@ -1,11 +1,12 @@
 
 import { Router } from 'express';
-import { requireAuth, AuthedRequest } from '../../core/middleware/auth.js';
+import { requireAuth, AuthedRequest } from '../../middleware/auth.js';
 import { z } from 'zod';
 import { Message } from './message.model.js';
 import { Conversation } from '../conversations/conversation.model.js';
 import { config } from '../../config/env.js';
-import { sendFcm } from '../../core/utils/fcm.js';
+import { sendFcm } from '../../utils/fcm';
+import { Audit } from '../audit/audit.model.js';
 
 export const messagesRouter = Router();
 
@@ -58,10 +59,8 @@ messagesRouter.post('/:id/read', requireAuth, async (req: AuthedRequest, res) =>
 });
 
 
-/** delete message (admin) */
-import { requireAdmin } from '../../core/middleware/auth.js';
-import { Audit } from '../audit/audit.model.js';
-messagesRouter.delete('/:id', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+
+messagesRouter.delete('/:id', requireAuth, async (req: AuthedRequest, res) => {
   const id = req.params.id;
   const m = await Message.findByIdAndDelete(id);
   if (!m) return res.status(404).json({ error: 'Message not found' });

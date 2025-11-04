@@ -296,56 +296,56 @@
 //   }
 // }
 
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:go_router/go_router.dart';
 
-class RegisterScreen extends ConsumerStatefulWidget {
-  const RegisterScreen({super.key});
+// class RegisterScreen extends ConsumerStatefulWidget {
+//   const RegisterScreen({super.key});
 
-  @override
-  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
-}
+//   @override
+//   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
+// }
 
-class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final _email = TextEditingController();
-  final _password = TextEditingController();
+// class _RegisterScreenState extends ConsumerState<RegisterScreen> {
+//   final _email = TextEditingController();
+//   final _password = TextEditingController();
 
-  @override
-  Widget build(BuildContext context) {
-    final authState = ref.watch(authControllerProvider);
+//   @override
+//   Widget build(BuildContext context) {
+//     final authState = ref.watch(authControllerProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("Create Account")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _email,
-              decoration: const InputDecoration(labelText: "Email"),
-            ),
-            TextField(
-              controller: _password,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: "Password"),
-            ),
-            const SizedBox(height: 16),
-            authState.isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: () => ref
-                        .read(authControllerProvider.notifier)
-                        .register(_email.text, _password.text),
-                    child: const Text("Register"),
-                  ),
-            TextButton(
-              onPressed: () => context.go('/login'),
-              child: const Text("Back to login"),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//     return Scaffold(
+//       appBar: AppBar(title: const Text("Create Account")),
+//       body: Padding(
+//         padding: const EdgeInsets.all(16),
+//         child: Column(
+//           children: [
+//             TextField(
+//               controller: _email,
+//               decoration: const InputDecoration(labelText: "Email"),
+//             ),
+//             TextField(
+//               controller: _password,
+//               obscureText: true,
+//               decoration: const InputDecoration(labelText: "Password"),
+//             ),
+//             const SizedBox(height: 16),
+//             authState.isLoading
+//                 ? const CircularProgressIndicator()
+//                 : ElevatedButton(
+//                     onPressed: () => ref
+//                         .read(authControllerProvider.notifier)
+//                         .register(_email.text, _password.text),
+//                     child: const Text("Register"),
+//                   ),
+//             TextButton(
+//               onPressed: () => context.go('/login'),
+//               child: const Text("Back to login"),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

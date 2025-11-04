@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { User } from "./user.model";
+import { User } from "../users/user.model";
 import { success, fail } from "../../utils/response";
 
 export const searchUsers = async (req: Request, res: Response) => {

@@ -47,7 +47,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
-import { errorHandler } from './core/middleware/errorHandler.js';
+// import { errorHandler } from './core/middleware/errorHandler.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { usersRouter } from './modules/users/users.routes.js';
 import { conversationsRouter } from './modules/conversations/conversations.routes.js';
@@ -57,7 +57,9 @@ import { aiRouter } from './modules/ai/ai.routes.js';
 import { auditRouter } from './modules/audit/audit.routes.js';
 import { docsRouter } from './swagger.js';
 import { config } from './config/env.js';
-import uploadRoutes from "./modules/uploads/upload.routes";
+// import uploadRoutes from "./modules/uploads/upload.routes";
+import { errorHandler } from './middleware/errorHandler';
+
 
 export function createApp() {
   const app = express();
@@ -75,7 +77,7 @@ export function createApp() {
   app.use('/api/ai', aiRouter);
   app.use('/api/audit', auditRouter);
   app.use('/api/docs', docsRouter);
-  app.use("/upload", uploadRoutes);
+  // app.use("/upload", uploadRoutes);
   app.use('/uploads', express.static(path.resolve(config.uploadDir)));
   app.use(errorHandler);
   return app;

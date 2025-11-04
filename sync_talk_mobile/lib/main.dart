@@ -217,6 +217,8 @@ import 'package:sync_talk_mobile/core/services/session.dart';
 import 'package:sync_talk_mobile/core/theme/app_theme.dart';
 import 'package:sync_talk_mobile/features/auth/presentation/login_screen.dart';
 import 'package:sync_talk_mobile/features/auth/presentation/register_screen.dart';
+import 'package:sync_talk_mobile/features/auth/view/login_screen.dart';
+import 'package:sync_talk_mobile/features/auth/view/register_screen.dart';
 import 'package:sync_talk_mobile/features/call/view/call_screen.dart';
 import 'package:sync_talk_mobile/features/chat/presentation/chat_screen.dart';
 import 'package:sync_talk_mobile/features/chat/presentation/home_screen.dart';
@@ -287,7 +289,8 @@ class SyncTalkApp extends ConsumerWidget {
       redirect: (context, state) async {
         final isLoggedIn = await session.isLoggedIn();
         final isAuthRoute =
-            state.location == '/login' || state.location == '/register';
+            state.matchedLocation == '/login' ||
+            state.matchedLocation == '/register';
 
         // If not logged in and trying to access protected route
         if (!isLoggedIn && !isAuthRoute) {

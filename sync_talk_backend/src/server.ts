@@ -177,11 +177,14 @@
 
 
 import http from "http";
-import app from "./app";
+// import app from "./app";
 import { Server } from "socket.io";
-import connectDB from "./config/db";
-import { User } from "./modules/auth/user.model";
+// import connectDB from "./config/db";
+import { User } from "./modules/users/user.model";
+import { createApp } from "./app";
+import { connectDB } from "./config/db";
 
+const app = createApp();
 const PORT = process.env.PORT || 8000;
 
 const server = http.createServer(app);

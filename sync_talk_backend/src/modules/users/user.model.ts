@@ -1,7 +1,14 @@
 
 import mongoose, { Schema, Document } from 'mongoose';
 export interface IUser extends Document {
-  email: string; passwordHash?: string; displayName: string; avatarUrl?: string; role: 'user'|'admin'|'moderator'; banned: boolean; createdAt: Date; updatedAt: Date;
+  email: string;
+   passwordHash?: string; 
+   displayName: string;
+    avatarUrl?: string; 
+    role: 'user'|'admin'|'moderator';
+     banned: boolean; 
+     createdAt: Date; 
+     updatedAt: Date;
 }
 const UserSchema = new Schema<IUser>({
   email: { type: String, unique: true, required: true },

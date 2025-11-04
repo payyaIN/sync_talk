@@ -1,6 +1,6 @@
 
 import { Router } from 'express';
-import { requireAuth, requireAdmin } from '../../core/middleware/auth.js';
+import { requireAuth, requireAdmin } from '../../middleware/auth.js';
 import { Audit } from './audit.model.js';
 export const auditRouter = Router();
 auditRouter.get('/', requireAuth, requireAdmin, async (_req, res) => {
