@@ -21,6 +21,7 @@ import { RefreshToken } from './refreshToken.model.js';
 import { signAccess, signRefresh, verifyRefresh } from './jwt.js';
 import { config } from '../../config/env.js';
 import { OAuth2Client } from 'google-auth-library';
+import { Types } from 'mongoose';
 
 export const authRouter = Router();
 const googleClientId = config.googleClientId;
@@ -35,7 +36,7 @@ authRouter.post('/register', async (req, res) => {
   if (exists) return res.status(409).json({ error: 'Email already in use' });
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await User.create({ email, passwordHash, displayName });
-  res.status(201).json({ id: user._id.toString(), email: user.email, displayName: user.displayName });
+  res.status(201).json({  id: (user._id as Types.ObjectId).toString(), email: user.email, displayName: user.displayName });
 });
 
 const loginSchema = z.object({ email: z.string().email(), password: z.string().min(6) });
@@ -48,12 +49,12 @@ authRouter.post('/login', async (req, res) => {
   if (user.banned) return res.status(403).json({ error: 'User banned' });
   const ok = await bcrypt.compare(password, user.passwordHash);
   if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
-  const accessToken = signAccess({ sub: user._id.toString(), email: user.email, role: user.role });
-  const refreshToken = signRefresh({ sub: user._id.toString() });
+  const accessToken = signAccess({ sub: (user._id as Types.ObjectId).toString(), email: user.email, role: user.role });
+  const refreshToken = signRefresh({ sub: (user._id as Types.ObjectId).toString() });
   const expiresSec = parseInt(String(process.env.REFRESH_EXPIRES_IN || '2592000s').replace('s','')) || 2592000;
   const expiresAt = new Date(Date.now() + expiresSec * 1000);
   await RefreshToken.create({ user: user._id, token: refreshToken, expiresAt });
-  res.json({ accessToken, refreshToken, user: { id: user._id.toString(), email: user.email, displayName: user.displayName, role: user.role } });
+  res.json({ accessToken, refreshToken, user: { id: (user._id as Types.ObjectId).toString(), email: user.email, displayName: user.displayName, role: user.role } });
 });
 
 const googleSchema = z.object({ idToken: z.string().min(10) });
@@ -68,12 +69,12 @@ authRouter.post('/google', async (req, res) => {
     let user = await User.findOne({ email: payload.email });
     if (!user) user = await User.create({ email: payload.email, displayName: payload.name || payload.email.split('@')[0], avatarUrl: payload.picture });
     if (user.banned) return res.status(403).json({ error: 'User banned' });
-    const accessToken = signAccess({ sub: user._id.toString(), email: user.email, role: user.role });
-    const refreshToken = signRefresh({ sub: user._id.toString() });
+    const accessToken = signAccess({ sub: (user._id as Types.ObjectId).toString(), email: user.email, role: user.role });
+    const refreshToken = signRefresh({ sub: (user._id as Types.ObjectId).toString() });
     const expiresSec = parseInt(String(process.env.REFRESH_EXPIRES_IN || '2592000s').replace('s','')) || 2592000;
     const expiresAt = new Date(Date.now() + expiresSec * 1000);
     await RefreshToken.create({ user: user._id, token: refreshToken, expiresAt });
-    res.json({ accessToken, refreshToken, user: { id: user._id.toString(), email: user.email, displayName: user.displayName, role: user.role, avatarUrl: user.avatarUrl } });
+    res.json({ accessToken, refreshToken, user: { id: (user._id as Types.ObjectId).toString(), email: user.email, displayName: user.displayName, role: user.role, avatarUrl: user.avatarUrl } });
   } catch (e) {
     res.status(401).json({ error: 'Google verification failed' });
   }

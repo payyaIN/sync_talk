@@ -97,6 +97,8 @@
 // }
 
 //new
+// File: lib/core/services/session.dart
+// Complete Session class with all required methods
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -110,19 +112,14 @@ class Session {
   String? refreshToken;
   String? userId;
 
+  // Load session data from secure storage
   Future<void> load() async {
     accessToken = await _storage.read(key: _keyAccessToken);
     refreshToken = await _storage.read(key: _keyRefreshToken);
     userId = await _storage.read(key: _keyUserId);
   }
 
-  Future<void> setTokens(String access, String refresh) async {
-    accessToken = access;
-    refreshToken = refresh;
-    await _storage.write(key: _keyAccessToken, value: access);
-    await _storage.write(key: _keyRefreshToken, value: refresh);
-  }
-
+  // Save all current session data
   Future<void> save() async {
     if (accessToken != null) {
       await _storage.write(key: _keyAccessToken, value: accessToken!);
@@ -135,18 +132,72 @@ class Session {
     }
   }
 
+  // Set both tokens at once (convenience method)
+  Future<void> setTokens(String access, String refresh) async {
+    accessToken = access;
+    refreshToken = refresh;
+    await _storage.write(key: _keyAccessToken, value: access);
+    await _storage.write(key: _keyRefreshToken, value: refresh);
+  }
+
+  // Individual getter methods (async)
+  Future<String?> getAccessToken() async {
+    return await _storage.read(key: _keyAccessToken);
+  }
+
+  Future<String?> getRefreshToken() async {
+    return await _storage.read(key: _keyRefreshToken);
+  }
+
+  Future<String?> getUserId() async {
+    return await _storage.read(key: _keyUserId);
+  }
+
+  // Individual setter methods
+  Future<void> setAccessToken(String token) async {
+    accessToken = token;
+    await _storage.write(key: _keyAccessToken, value: token);
+  }
+
+  Future<void> setRefreshToken(String token) async {
+    refreshToken = token;
+    await _storage.write(key: _keyRefreshToken, value: token);
+  }
+
+  Future<void> setUserId(String id) async {
+    userId = id;
+    await _storage.write(key: _keyUserId, value: id);
+  }
+
+  // Store user object (extracts ID from user map)
+  Future<void> setUser(Map<String, dynamic> user) async {
+    if (user['id'] != null) {
+      await setUserId(user['id']);
+    }
+  }
+
+  // Check if user is logged in (async method)
+  Future<bool> isLoggedIn() async {
+    final token = await getAccessToken();
+    return token != null && token.isNotEmpty;
+  }
+
+  // Sync getter for quick access (use after load() has been called)
+  bool get isLoggedInSync => accessToken != null;
+
+  // Clear all session data
   Future<void> clear() async {
     accessToken = null;
     refreshToken = null;
     userId = null;
     await _storage.deleteAll();
   }
-
-  bool get isLoggedIn => accessToken != null;
 }
 
+// Global session instance
 final session = Session();
 
+// Initialize session (call this in main.dart)
 Future<void> initSession() async {
   await session.load();
 }

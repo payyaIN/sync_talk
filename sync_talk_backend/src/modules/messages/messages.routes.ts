@@ -7,6 +7,7 @@ import { Conversation } from '../conversations/conversation.model.js';
 import { config } from '../../config/env.js';
 import { sendFcm } from '../../utils/fcm';
 import { Audit } from '../audit/audit.model.js';
+import { Types } from 'mongoose';
 
 export const messagesRouter = Router();
 
@@ -17,7 +18,7 @@ messagesRouter.get('/:conversationId', requireAuth, async (req: AuthedRequest, r
   const filter: any = { conversation: convId, parentMessage: { $exists: false } };
   if (cursor) filter.createdAt = { $lt: cursor };
   const messages = await Message.find(filter).sort({ createdAt: -1 }).limit(limit);
-  const items = messages.map(m => ({ id: m._id.toString(), sender: m.sender, content: m.content, attachments: m.attachments, readBy: m.readBy, createdAt: m.createdAt }));
+  const items = messages.map(m => ({ id: (m._id as Types.ObjectId).toString(), sender: m.sender, content: m.content, attachments: m.attachments, readBy: m.readBy, createdAt: m.createdAt }));
   const nextCursor = messages.length ? messages[messages.length-1].createdAt.toISOString() : null;
   res.json({ items: items.reverse(), nextCursor });
 });
@@ -32,7 +33,7 @@ messagesRouter.post('/:conversationId', requireAuth, async (req: AuthedRequest, 
   if (!parsed.success) return res.status(400).json(parsed.error);
   const msg = await Message.create({ conversation: convId, sender: req.user!.sub, ...parsed.data });
   conv.lastMessageAt = new Date(); await conv.save();
-  const io = req.app.get('io'); io?.of('/chat').to(convId).emit('message:new', { conversationId: convId, id: msg._id.toString(), sender: msg.sender, content: msg.content, attachments: msg.attachments, createdAt: msg.createdAt });
+  const io = req.app.get('io'); io?.of('/chat').to(convId).emit('message:new', { conversationId: convId, id: (msg._id as Types.ObjectId).toString(), sender: msg.sender, content: msg.content, attachments: msg.attachments, createdAt: msg.createdAt });
   const tokens: Map<string,string> | undefined = (global as any).__deviceTokens;
   if (tokens && process.env.FCM_SERVER_KEY) {
     for (const p of conv.participants.map(String)) {
@@ -42,7 +43,7 @@ messagesRouter.post('/:conversationId', requireAuth, async (req: AuthedRequest, 
       }
     }
   }
-  res.status(201).json({ id: msg._id.toString() });
+  res.status(201).json({ id: (msg._id as Types.ObjectId).toString() });
 });
 
 messagesRouter.post('/:id/read', requireAuth, async (req: AuthedRequest, res) => {
@@ -80,5 +81,7 @@ messagesRouter.get('/search', requireAuth, async (req: AuthedRequest, res) => {
     .find({ participants: req.user!.sub }).distinct('_id');
   const list = await Message.find({ conversation: { $in: await convIds }, content: { $regex: q, $options: 'i' } })
     .sort({ createdAt: -1 }).limit(50);
-  res.json({ items: list.map(m => ({ id: m._id.toString(), conversation: m.conversation, sender: m.sender, content: m.content, createdAt: m.createdAt })) });
+  res.json({ items: list.map(m => ({ id: (m._id as Types.ObjectId).toString(), 
+    conversation: m.conversation, 
+    sender: m.sender, content: m.content, createdAt: m.createdAt })) });
 });

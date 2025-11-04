@@ -1,63 +1,98 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/auth_repository.dart';
 import 'auth_providers.dart';
 
 class AuthViewModel {
   final Ref ref;
   AuthViewModel(this.ref);
 
-  Future<void> tryLoadSession() async {
-    final repo = ref.read(authRepositoryProvider);
-    ref.read(authLoadingProvider.notifier).state = true;
-    try {
-      final u = await repo.currentUser();
-      ref.read(authStateProvider.notifier).state = u;
-    } catch (e) {
-      // ignore silently if no session
-    } finally {
-      ref.read(authLoadingProvider.notifier).state = false;
-    }
-  }
-
-  Future<bool> login(String email, String password) async {
-    final repo = ref.read(authRepositoryProvider);
+  /// Login user
+  Future<void> login(String email, String password) async {
     ref.read(authLoadingProvider.notifier).state = true;
     ref.read(authErrorProvider.notifier).state = null;
+
     try {
-      await repo.login(email, password);
-      final u = await repo.currentUser();
-      ref.read(authStateProvider.notifier).state = u;
-      return true;
+      final repo = ref.read(authRepositoryProvider);
+      // Use NAMED parameters
+      final result = await repo.login(email: email, password: password);
+
+      // Store user state
+      ref.read(authStateProvider.notifier).state = result['user'];
     } catch (e) {
-      ref.read(authErrorProvider.notifier).state = "Login failed";
-      return false;
+      ref.read(authErrorProvider.notifier).state = e.toString();
+      rethrow;
     } finally {
       ref.read(authLoadingProvider.notifier).state = false;
     }
   }
 
-  Future<bool> register(String name, String email, String password) async {
-    final repo = ref.read(authRepositoryProvider);
+  /// Register new user
+  Future<void> register(String name, String email, String password) async {
     ref.read(authLoadingProvider.notifier).state = true;
     ref.read(authErrorProvider.notifier).state = null;
+
     try {
-      await repo.register(name, email, password);
-      final u = await repo.currentUser();
-      ref.read(authStateProvider.notifier).state = u;
-      return true;
+      final repo = ref.read(authRepositoryProvider);
+      // Use NAMED parameters
+      final result = await repo.register(
+        name: name,
+        email: email,
+        password: password,
+      );
+
+      // Store user state
+      ref.read(authStateProvider.notifier).state = result['user'];
     } catch (e) {
-      ref.read(authErrorProvider.notifier).state = "Register failed";
-      return false;
+      ref.read(authErrorProvider.notifier).state = e.toString();
+      rethrow;
     } finally {
       ref.read(authLoadingProvider.notifier).state = false;
     }
   }
 
+  /// Login with Google
+  Future<void> loginWithGoogle(String idToken) async {
+    ref.read(authLoadingProvider.notifier).state = true;
+    ref.read(authErrorProvider.notifier).state = null;
+
+    try {
+      final repo = ref.read(authRepositoryProvider);
+      final result = await repo.loginWithGoogle(idToken);
+
+      // Store user state
+      ref.read(authStateProvider.notifier).state = result['user'];
+    } catch (e) {
+      ref.read(authErrorProvider.notifier).state = e.toString();
+      rethrow;
+    } finally {
+      ref.read(authLoadingProvider.notifier).state = false;
+    }
+  }
+
+  /// Get current user
+  Future<void> getCurrentUser() async {
+    try {
+      final repo = ref.read(authRepositoryProvider);
+      final user = await repo.currentUser();
+      ref.read(authStateProvider.notifier).state = user;
+    } catch (e) {
+      ref.read(authStateProvider.notifier).state = null;
+    }
+  }
+
+  /// Logout user
   Future<void> logout() async {
-    await ref.read(authRepositoryProvider).logout();
-    ref.read(authStateProvider.notifier).state = null;
+    try {
+      await ref.read(authRepositoryProvider).logout();
+    } finally {
+      ref.read(authStateProvider.notifier).state = null;
+    }
+  }
+
+  /// Check if logged in
+  Future<bool> checkLoginStatus() async {
+    return await ref.read(authRepositoryProvider).isLoggedIn();
   }
 }
 
-final authViewModelProvider = Provider<AuthViewModel>(
-  (ref) => AuthViewModel(ref),
-);
+final authViewModelProvider = Provider((ref) => AuthViewModel(ref));
