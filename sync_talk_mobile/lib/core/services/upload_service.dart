@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:sync_talk_mobile/core/services/api.dart' as ApiClient;
 

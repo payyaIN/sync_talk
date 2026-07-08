@@ -1,6 +1,8 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../api.dart';
+import '../theme.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -34,34 +36,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> banUser(String id, bool banned) async {
-    await api.post('/api/users/${id}/${banned ? 'ban' : 'unban'}');
+    await api.post('/api/users/$id/${banned ? 'ban' : 'unban'}');
     await load();
   }
 
   Future<void> setRole(String id, String role) async {
-    await api.post('/api/users/${id}/role', data: {'role': role});
+    await api.post('/api/users/$id/role', data: {'role': role});
     await load();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (loading)
+    if (loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Dashboard'),
+        title: Row(
+          children: [
+            const Icon(Icons.admin_panel_settings, color: AdminTheme.primaryBlue),
+            const SizedBox(width: 12),
+            Text('SyncTalk Dashboard', style: Theme.of(context).textTheme.headlineMedium),
+          ],
+        ),
         actions: [
-          TextButton(
+          TextButton.icon(
             onPressed: () => Navigator.pushNamed(context, '/moderation'),
-            child: const Text(
-              'Moderation',
-              style: TextStyle(color: Colors.white),
-            ),
+            icon: const Icon(Icons.security, size: 20),
+            label: const Text('Moderation'),
           ),
-          TextButton(
+          const SizedBox(width: 8),
+          TextButton.icon(
             onPressed: () => Navigator.pushNamed(context, '/audit'),
-            child: const Text('Audit', style: TextStyle(color: Colors.white)),
+            icon: const Icon(Icons.history, size: 20),
+            label: const Text('Audit Logs'),
           ),
+          const SizedBox(width: 16),
         ],
       ),
       body: Row(
@@ -72,14 +82,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Users',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
+                  Text('Users Management', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
                   Expanded(
-                    child: DataTable2(
-                      columns: const [
+                    child: Container(
+                      decoration: AdminTheme.glassDecoration,
+                      child: DataTable2(
+                        headingRowColor: MaterialStateProperty.all(Colors.white.withOpacity(0.05)),
+                        columnSpacing: 12,
+                        horizontalMargin: 12,
+                        columns: const [
                         DataColumn2(label: Text('ID')),
                         DataColumn2(label: Text('Name')),
                         DataColumn2(label: Text('Email')),
@@ -128,6 +140,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           )
                           .toList(),
+                      ),
                     ),
                   ),
                 ],
@@ -141,14 +154,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Conversations',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
+                  Text('Active Conversations', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: convos.length,
+                    child: Container(
+                      decoration: AdminTheme.glassDecoration,
+                      clipBehavior: Clip.antiAlias,
+                      child: ListView.separated(
+                        itemCount: convos.length,
+                        separatorBuilder: (_, __) => Divider(color: Colors.white.withOpacity(0.1), height: 1),
                       itemBuilder: (_, i) {
                         final c = convos[i];
                         return ListTile(
@@ -160,10 +174,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       },
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
+        ),
         ],
       ),
     );

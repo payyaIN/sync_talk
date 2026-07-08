@@ -6,16 +6,17 @@ import { success, fail } from "../../utils/response";
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body;
+    const { displayName, email, password } = req.body;
 
     const exists = await User.findOne({ email });
     if (exists) return fail(res, "Email already registered");
 
     const hash = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hash });
+    const user = await User.create({ displayName, email, passwordHash: hash });
 
     return success(res, "User registered", user);
   } catch (error) {
+    console.error("Register Error:", error);
     return fail(res, "Registration failed", 500);
   }
 };

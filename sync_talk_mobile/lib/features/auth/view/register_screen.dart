@@ -239,7 +239,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: Colors.black,
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
@@ -265,7 +265,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: Colors.black,
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
@@ -304,7 +304,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: Colors.black,
                               helperText: 'At least 6 characters',
                             ),
                             validator: (value) {
@@ -344,7 +344,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: Colors.black,
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {

@@ -24,8 +24,9 @@ class PushService {
         await dio.post('/api/users/device', data: {'token': token});
       }
       FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-        if (session.accessToken != null)
+        if (session.accessToken != null) {
           await dio.post('/api/users/device', data: {'token': newToken});
+        }
       });
 
       // fcm.onTokenRefresh.listen((t) async {

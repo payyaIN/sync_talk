@@ -100,6 +100,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../data/auth_repository.dart';
 import '../../../core/services/sockets.dart';
 
@@ -116,9 +117,30 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _authRepo = AuthRepository();
 
+  final _storage = const FlutterSecureStorage();
+
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _rememberMe = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final email = await _storage.read(key: 'saved_email');
+    final password = await _storage.read(key: 'saved_password');
+    if (email != null && password != null && mounted) {
+      setState(() {
+        _emailController.text = email;
+        _passwordController.text = password;
+        _rememberMe = true;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -140,6 +162,14 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+
+      if (_rememberMe) {
+        await _storage.write(key: 'saved_email', value: _emailController.text.trim());
+        await _storage.write(key: 'saved_password', value: _passwordController.text);
+      } else {
+        await _storage.delete(key: 'saved_email');
+        await _storage.delete(key: 'saved_password');
+      }
 
       if (mounted) {
         // Connect Socket.IO
@@ -299,7 +329,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: Colors.black,
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -337,7 +367,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: Colors.black,
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -350,7 +380,26 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                             enabled: !_isLoading,
                           ),
-                          const SizedBox(height: 24),
+                          
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: _rememberMe,
+                                onChanged: _isLoading ? null : (value) {
+                                  setState(() {
+                                    _rememberMe = value ?? false;
+                                  });
+                                },
+                                activeColor: theme.colorScheme.primary,
+                                side: BorderSide(color: Colors.grey[400]!),
+                              ),
+                              Text(
+                                'Remember me',
+                                style: TextStyle(color: Colors.grey[400]),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
 
                           // Login Button
                           ElevatedButton(

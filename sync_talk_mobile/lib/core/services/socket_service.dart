@@ -1,120 +1,36 @@
-// import 'package:socket_io_client/socket_io_client.dart' as IO;
-// import '../config/app_env.dart';
-// import '../utils/token_store.dart';
-
-// class SocketService {
-//   static IO.Socket? socket;
-
-//   static Future<void> connect() async {
-//     final token = await TokenStore.read();
-//     socket = IO.io(AppEnv.socketUrl,
-//         IO.OptionBuilder()
-//             .setTransports(['websocket'])
-//             .setAuth({'token': token})
-//             .disableAutoConnect()
-//             .build(),
-//     );
-//     socket!.connect();
-//   }
-
-//   static void joinRoom(String roomId) {
-//     socket?.emit("join_room", roomId);
-//   }
-
-//   static void sendMessage(String roomId, String message) {
-//     socket?.emit("send_message", {"roomId": roomId, "message": message});
-//   }
-
-//   static void onMessage(Function(dynamic) handler) {
-//     socket?.on("receive_message", handler);
-//   }
-// }
-
-// import 'package:socket_io_client/socket_io_client.dart' as IO;
-// import '../config/app_env.dart';
-
-// class SocketService {
-//   static IO.Socket? _socket;
-
-//   static IO.Socket connect(String userId) {
-//     _socket ??= IO.io(AppEnv.socketUrl, {
-//       'transports': ['websocket'],
-//       'autoConnect': true,
-//     });
-
-//     _socket!.onConnect((_) {
-//       _socket!.emit("hello", userId);
-//     });
-
-//     return _socket!;
-//   }
-
-//   static void join(String roomId) {
-//     _socket?.emit('join_room', roomId);
-//   }
-
-//   static void send(String roomId, String text, {String? forwardOf}) {
-//     _socket?.emit('send_message', {
-//       'roomId': roomId,
-//       'message': text,
-//       'forwardOf': forwardOf,
-//     });
-//   }
-
-//   static void seen(String roomId) {
-//     _socket?.emit('seen_messages', roomId);
-//   }
-
-//   static void typing(String roomId) {
-//     _socket?.emit('typing', roomId);
-//   }
-
-//   static void stopTyping(String roomId) {
-//     _socket?.emit('stop_typing', roomId);
-//   }
-
-//   static void onMessage(void Function(dynamic) cb) {
-//     _socket?.on('receive_message', cb);
-//   }
-
-//   static void onStatus(void Function(dynamic) cb) {
-//     _socket?.on('message_status_update', cb);
-//   }
-
-//   static void onSeen(void Function(dynamic) cb) {
-//     _socket?.on('messages_seen', cb);
-//   }
-
-//   static void onTyping(void Function(dynamic) cb) {
-//     _socket?.on('typing', cb);
-//   }
-
-//   static void onStopTyping(void Function(dynamic) cb) {
-//     _socket?.on('stop_typing', cb);
-//   }
-// }
-
+import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:sync_talk_mobile/core/config/app_env.dart';
+import 'session.dart';
+import '../config/app_env.dart';
 
-class SocketService {
+class SocketService extends ChangeNotifier {
   static IO.Socket? _socket;
 
+  static String get _socketUrl => '${AppEnv.socketUrl}/chat';
+
   static IO.Socket connect(String userId) {
-    _socket ??= IO.io(AppEnv.socketUrl, {
-      'transports': ['websocket'],
-      'autoConnect': true,
-    });
+    if (_socket != null && _socket!.connected) return _socket!;
+
+    _socket = IO.io(
+      _socketUrl,
+      IO.OptionBuilder()
+          .setTransports(['websocket'])
+          .disableAutoConnect()
+          .build(),
+    );
 
     _socket!.onConnect((_) {
-      _socket!.emit('user_online', userId);
+      print('✅ Socket Connected: ${_socket!.id}');
+      // _socket!.emit('user_online', userId); // Backend might need to listen to this on /chat or remove if using connection event
     });
 
+    _socket!.onConnectError((data) => print('❌ Socket Error: $data'));
+
+    _socket!.connect();
     return _socket!;
   }
 
   static void disconnect(String userId) {
-    _socket?.emit('user_offline', userId);
     _socket?.disconnect();
   }
 
@@ -122,16 +38,25 @@ class SocketService {
     _socket?.emit('join_room', roomId);
   }
 
-  static void send(String roomId, String text, {String? forwardOf}) {
+  static void send(
+    String roomId,
+    String text,
+    String senderId, {
+    String? forwardOf,
+    List<String> attachments = const [],
+  }) {
+    // Backend expects: { roomId, content, senderId, attachments }
     _socket?.emit('send_message', {
       'roomId': roomId,
-      'message': text,
+      'content': text, // Changed from 'message' to 'content' to match backend
+      'senderId': senderId,
       'forwardOf': forwardOf,
+      'attachments': attachments,
     });
   }
 
-  static void seen(String roomId) {
-    _socket?.emit('seen_messages', roomId);
+  static void onMessage(void Function(dynamic) cb) {
+    _socket?.on('receive_message', cb);
   }
 
   static void typing(String roomId) {
@@ -140,26 +65,6 @@ class SocketService {
 
   static void stopTyping(String roomId) {
     _socket?.emit('stop_typing', roomId);
-  }
-
-  static void onMessage(void Function(dynamic) cb) {
-    _socket?.on('receive_message', cb);
-  }
-
-  static void onStatus(void Function(dynamic) cb) {
-    _socket?.on('message_status_update', cb);
-  }
-
-  static void onSeen(void Function(dynamic) cb) {
-    _socket?.on('messages_seen', cb);
-  }
-
-  static void onTyping(void Function(dynamic) cb) {
-    _socket?.on('typing', cb);
-  }
-
-  static void onStopTyping(void Function(dynamic) cb) {
-    _socket?.on('stop_typing', cb);
   }
 
   static void onPresence(void Function(dynamic) cb) {

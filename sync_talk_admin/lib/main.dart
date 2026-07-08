@@ -6,9 +6,18 @@ import 'src/screens/login.dart';
 import 'src/screens/dashboard.dart';
 import 'src/screens/messages_moderation.dart';
 import 'src/screens/audit_logs.dart';
+import 'src/theme.dart';
+
+class StateLogger extends ProviderObserver {
+  const StateLogger();
+  @override
+  void didUpdateProvider(ProviderBase provider, Object? previousValue, Object? newValue, ProviderContainer container) {
+    print('🔄 [STATE CHANGE] provider: ${provider.name ?? provider.runtimeType}, value: $newValue');
+  }
+}
 
 void main() {
-  runApp(const ProviderScope(child: AdminApp()));
+  runApp(const ProviderScope(observers: [StateLogger()], child: AdminApp()));
 }
 
 class AdminApp extends StatelessWidget {
@@ -26,8 +35,9 @@ class AdminApp extends StatelessWidget {
     );
     return MaterialApp.router(
       title: 'SyncTalk Admin',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo)),
-      darkTheme: ThemeData.dark(useMaterial3: true),
+      theme: AdminTheme.darkTheme,
+      darkTheme: AdminTheme.darkTheme,
+      themeMode: ThemeMode.dark,
       routerConfig: router,
     );
   }

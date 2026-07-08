@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import '../api.dart';
+import '../theme.dart';
 
 class MessagesModerationScreen extends StatefulWidget {
   const MessagesModerationScreen({super.key});
@@ -18,7 +19,7 @@ class _MessagesModerationScreenState extends State<MessagesModerationScreen> {
   Future<void> load() async {
     final id = convCtrl.text.trim();
     if (id.isEmpty) return;
-    setState(()=> {loading=true, error=null});
+    setState(() { loading=true; error=null; });
     try {
       final resp = await api.get('/api/messages/$id');
       final data = resp.data['items'] ?? [];
@@ -42,20 +43,45 @@ class _MessagesModerationScreenState extends State<MessagesModerationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Messages Moderation')),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            const Icon(Icons.security, color: AdminTheme.primaryPurple),
+            const SizedBox(width: 12),
+            Text('Messages Moderation', style: Theme.of(context).textTheme.headlineMedium),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
             Row(children: [
-              Expanded(child: TextField(controller: convCtrl, decoration: const InputDecoration(labelText: 'Conversation ID'))),
-              const SizedBox(width: 8),
-              FilledButton(onPressed: loading? null : load, child: Text(loading? '...' : 'Load')),
+              Expanded(
+                child: TextField(
+                  controller: convCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Conversation ID',
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              FilledButton.icon(
+                onPressed: loading ? null : load,
+                icon: const Icon(Icons.download),
+                label: Text(loading ? 'Loading...' : 'Load Messages'),
+              ),
             ]),
-            if (error != null) Padding(padding: const EdgeInsets.only(top:8), child: Text(error!, style: const TextStyle(color: Colors.red))),
-            const SizedBox(height: 12),
+            if (error != null) Padding(padding: const EdgeInsets.only(top: 16), child: Text(error!, style: const TextStyle(color: Colors.redAccent))),
+            const SizedBox(height: 24),
             Expanded(
-              child: DataTable2(
+              child: Container(
+                decoration: AdminTheme.glassDecoration,
+                child: DataTable2(
+                  headingRowColor: MaterialStateProperty.all(Colors.white.withOpacity(0.05)),
+                  columnSpacing: 12,
+                  horizontalMargin: 12,
                 columns: const [
                   DataColumn2(label: Text('ID'), size: ColumnSize.L),
                   DataColumn2(label: Text('Sender')),
@@ -79,6 +105,7 @@ class _MessagesModerationScreenState extends State<MessagesModerationScreen> {
                     }),
                   ])),
                 ])).toList(),
+                ),
               ),
             ),
           ],

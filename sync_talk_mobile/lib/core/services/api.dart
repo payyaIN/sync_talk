@@ -1,454 +1,15 @@
-// import 'package:dio/dio.dart';
-// import 'session.dart';
-
-// final dio =
-//     Dio(
-//         BaseOptions(
-//           baseUrl: const String.fromEnvironment(
-//             'API_BASE',
-//             defaultValue: 'http://192.168.1.8:4000',
-//           ),
-//         ),
-//       )
-//       ..interceptors.add(
-//         InterceptorsWrapper(
-//           onRequest: (options, handler) {
-//             final token = session.accessToken;
-//             if (token != null)
-//               options.headers['Authorization'] = 'Bearer $token';
-//             handler.next(options);
-//           },
-//         ),
-//       );
-
-// import 'package:dio/dio.dart';
-// import 'package:flutter/foundation.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-
-// /// Use your laptop LAN IP (same Wi-Fi as phone).
-// /// Example: http://192.168.1.8:4000
-// const String apiBase = String.fromEnvironment(
-//   'API_BASE_URL',
-//   defaultValue: 'http://192.168.1.8:4000',
-// );
-
-// class Api {
-//   final Dio _dio = Dio(
-//     BaseOptions(
-//       baseUrl: apiBase,
-//       connectTimeout: const Duration(seconds: 10),
-//       receiveTimeout: const Duration(seconds: 20),
-//     ),
-//   );
-
-//   String _friendlyError(Object err) {
-//     if (err is DioException) {
-//       final data = err.response?.data;
-//       if (data is Map && data['message'] is String) return data['message'] as String;
-//       if (err.type == DioExceptionType.connectionTimeout ||
-//           err.type == DioExceptionType.sendTimeout ||
-//           err.type == DioExceptionType.receiveTimeout) {
-//         return 'Server timeout. Check Wi-Fi and API base URL.';
-//       }
-//       if (err.type == DioExceptionType.connectionError) return 'Cannot reach server at $apiBase';
-//       return 'Request failed';
-//     }
-//     return 'Unexpected error';
-//   }
-
-//   Future<Dio> _authed() async {
-//     final prefs = await SharedPreferences.getInstance();
-//     final t = prefs.getString('token');
-//     final d = _dio;
-//     if (t != null) d.options.headers['Authorization'] = 'Bearer $t';
-//     return d;
-//   }
-
-//   Future<Map<String, dynamic>> register(String email, String password) async {
-//     try {
-//       final res = await _dio.post('/auth/register', data: {'email': email, 'password': password});
-//       return Map<String, dynamic>.from(res.data);
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-
-//   Future<Map<String, dynamic>> login(String email, String password) async {
-//     try {
-//       final r = await _dio.post('/auth/login', data: {'email': email, 'password': password});
-//       final token = r.data['accessToken'] as String?;
-//       if (token != null) {
-//         final prefs = await SharedPreferences.getInstance();
-//         await prefs.setString('token', token);
-//       }
-//       return Map<String, dynamic>.from(r.data);
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-
-//   Future<Map<String, dynamic>> me() async {
-//     try {
-//       final d = await _authed();
-//       final r = await d.get('/users/me');
-//       return Map<String, dynamic>.from(r.data);
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-
-//   Future<List<dynamic>> listConversations({int page = 1, int limit = 20}) async {
-//     try {
-//       final d = await _authed();
-//       final r = await d.get('/conversations', queryParameters: {'page': page, 'limit': limit});
-//       return r.data as List<dynamic>;
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-
-//   Future<Map<String, dynamic>> createConversation({String? name, List<String>? participants}) async {
-//     try {
-//       final d = await _authed();
-//       final r = await d.post('/conversations', data: {
-//         'name': name,
-//         'participants': participants ?? <String>[],
-//       });
-//       return Map<String, dynamic>.from(r.data);
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-
-//   Future<Map<String, dynamic>> sendMessage(String conversationId, String text) async {
-//     try {
-//       final d = await _authed();
-//       final r = await d.post('/messages', data: {'conversationId': conversationId, 'text': text});
-//       return Map<String, dynamic>.from(r.data);
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-// }
-
-// import 'package:dio/dio.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-
-// const String apiBase = String.fromEnvironment(
-//   'API_BASE_URL',
-//   // If you're running backend on your laptop & device is Android emulator, use 10.0.2.2
-//   // For physical device on same Wi-Fi, use your laptop’s LAN IP like http://192.168.1.8:4000
-//   defaultValue: 'http://192.168.1.8:4000',
-// );
-
-// class Api {
-//   final Dio _dio = Dio(
-//     BaseOptions(
-//       baseUrl: apiBase,
-//       connectTimeout: const Duration(seconds: 10),
-//       receiveTimeout: const Duration(seconds: 20),
-//     ),
-//   );
-
-//   String _friendlyError(Object err) {
-//     if (err is DioException) {
-//       final data = err.response?.data;
-//       if (data is Map && data['message'] is String)
-//         return data['message'] as String;
-//       if (err.type == DioExceptionType.connectionTimeout ||
-//           err.type == DioExceptionType.sendTimeout ||
-//           err.type == DioExceptionType.receiveTimeout) {
-//         return 'Server timeout. Check network/API base URL.';
-//       }
-//       if (err.type == DioExceptionType.connectionError) {
-//         return 'Cannot reach server at $apiBase';
-//       }
-//       return 'Request failed';
-//     }
-//     return 'Unexpected error';
-//   }
-
-//   Future<Dio> _authed() async {
-//     final prefs = await SharedPreferences.getInstance();
-//     final t = prefs.getString('token');
-//     final d = _dio;
-//     if (t != null) d.options.headers['Authorization'] = 'Bearer $t';
-//     return d;
-//   }
-
-//   Future<Map<String, dynamic>> register(String email, String password) async {
-//     try {
-//       final res = await _dio.post(
-//         '/auth/register',
-//         data: {'email': email, 'password': password},
-//       );
-//       return Map<String, dynamic>.from(res.data);
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-
-//   Future<Map<String, dynamic>> login(String email, String password) async {
-//     try {
-//       final r = await _dio.post(
-//         '/auth/login',
-//         data: {'email': email, 'password': password},
-//       );
-//       final token = r.data['accessToken'] as String?;
-//       if (token != null) {
-//         final prefs = await SharedPreferences.getInstance();
-//         await prefs.setString('token', token);
-//       }
-//       return Map<String, dynamic>.from(r.data);
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-
-//   Future<Map<String, dynamic>> me() async {
-//     try {
-//       final d = await _authed();
-//       final r = await d.get('/users/me');
-//       return Map<String, dynamic>.from(r.data);
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-
-//   Future<List<dynamic>> listConversations({
-//     int page = 1,
-//     int limit = 20,
-//   }) async {
-//     try {
-//       final d = await _authed();
-//       final r = await d.get(
-//         '/conversations',
-//         queryParameters: {'page': page, 'limit': limit},
-//       );
-//       return r.data as List<dynamic>;
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-
-//   Future<Map<String, dynamic>> sendMessage(
-//     String conversationId,
-//     String text,
-//   ) async {
-//     try {
-//       final d = await _authed();
-//       final r = await d.post(
-//         '/messages',
-//         data: {'conversationId': conversationId, 'text': text},
-//       );
-//       return Map<String, dynamic>.from(r.data);
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-
-//   Future<Map<String, dynamic>> createConversation({
-//     String? name,
-//     List<String>? participants,
-//   }) async {
-//     try {
-//       final d = await _authed();
-//       final r = await d.post(
-//         '/conversations',
-//         data: {
-//           'name': name,
-//           // backend accepts array; empty array means only you will be a participant
-//           'participants': participants ?? <String>[],
-//         },
-//       );
-//       return Map<String, dynamic>.from(r.data);
-//     } catch (e) {
-//       throw Exception(_friendlyError(e));
-//     }
-//   }
-// }
-
-// import 'package:dio/dio.dart';
-// import 'session.dart';
-
-// class ApiClient {
-//   static const String baseUrl = String.fromEnvironment(
-//     'API_BASE',
-//     defaultValue: 'http://10.0.2.2:4000/api', // Android emulator
-//     // For iOS: 'http://localhost:4000/api'
-//     // For device: 'http://YOUR_IP:4000/api'
-//   );
-
-//   static final Dio _dio = Dio(
-//     BaseOptions(
-//       baseUrl: baseUrl,
-//       connectTimeout: const Duration(seconds: 30),
-//       receiveTimeout: const Duration(seconds: 30),
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'Accept': 'application/json',
-//       },
-//     ),
-//   );
-
-//   static bool _isRefreshing = false;
-//   static List<Function> _requestsQueue = [];
-
-//   static void initialize() {
-//     // Request Interceptor - Add JWT token
-//     _dio.interceptors.add(
-//       InterceptorsWrapper(
-//         onRequest: (options, handler) async {
-//           // Skip token for auth endpoints
-//           if (options.path.contains('/auth/login') ||
-//               options.path.contains('/auth/register') ||
-//               options.path.contains('/auth/google')) {
-//             return handler.next(options);
-//           }
-
-//           // Add access token to headers
-//           final token = await session.getAccessToken();
-//           if (token != null) {
-//             options.headers['Authorization'] = 'Bearer $token';
-//           }
-
-//           return handler.next(options);
-//         },
-//         onError: (error, handler) async {
-//           // Handle 401 errors (token expired)
-//           if (error.response?.statusCode == 401) {
-//             if (!_isRefreshing) {
-//               _isRefreshing = true;
-
-//               try {
-//                 // Try to refresh token
-//                 await _refreshToken();
-
-//                 // Retry original request
-//                 final opts = error.requestOptions;
-//                 final token = await session.getAccessToken();
-//                 opts.headers['Authorization'] = 'Bearer $token';
-
-//                 final response = await _dio.fetch(opts);
-//                 _isRefreshing = false;
-
-//                 // Process queued requests
-//                 _processQueue();
-
-//                 return handler.resolve(response);
-//               } catch (e) {
-//                 _isRefreshing = false;
-
-//                 // Clear session and force logout
-//                 await session.clear();
-
-//                 // Process queued requests with error
-//                 _processQueue(error: error);
-
-//                 return handler.reject(error);
-//               }
-//             } else {
-//               // Queue this request while token is being refreshed
-//               return _addToQueue(
-//                 () => handler.resolve(error.response!),
-//                 (err) => handler.reject(err),
-//               );
-//             }
-//           }
-
-//           return handler.next(error);
-//         },
-//         onResponse: (response, handler) {
-//           // Log successful responses in debug mode
-//           print(
-//             '✅ API Response: ${response.requestOptions.path} - ${response.statusCode}',
-//           );
-//           return handler.next(response);
-//         },
-//       ),
-//     );
-
-//     // Logging Interceptor (debug mode only)
-//     _dio.interceptors.add(
-//       LogInterceptor(
-//         requestBody: true,
-//         responseBody: true,
-//         error: true,
-//         logPrint: (obj) => print('🔍 API: $obj'),
-//       ),
-//     );
-//   }
-
-//   static Future<void> _refreshToken() async {
-//     final refreshToken = await session.getRefreshToken();
-//     if (refreshToken == null) {
-//       throw Exception('No refresh token available');
-//     }
-
-//     final response = await _dio.post(
-//       '/auth/refresh',
-//       data: {'refreshToken': refreshToken},
-//       options: Options(
-//         headers: {}, // No auth header for refresh
-//       ),
-//     );
-
-//     final data = response.data;
-//     if (data['accessToken'] != null) {
-//       await session.setAccessToken(data['accessToken']);
-//     }
-//     if (data['refreshToken'] != null) {
-//       await session.setRefreshToken(data['refreshToken']);
-//     }
-//   }
-
-//   static Future<void> _addToQueue(
-//     Function onSuccess,
-//     Function(DioException) onError,
-//   ) async {
-//     _requestsQueue.add(() async {
-//       if (_isRefreshing) {
-//         await onSuccess();
-//       } else {
-//         await onError(
-//           DioException(
-//             requestOptions: RequestOptions(path: ''),
-//             error: 'Token refresh failed',
-//           ),
-//         );
-//       }
-//     });
-//   }
-
-//   static void _processQueue({DioException? error}) {
-//     for (var request in _requestsQueue) {
-//       request();
-//     }
-//     _requestsQueue.clear();
-//   }
-
-//   static Dio get instance => _dio;
-// }
-
-// // Global dio instance
-// final dio = ApiClient.instance;
-
-// // Initialize API client (call in main.dart)
-// void initApi() {
-//   ApiClient.initialize();
-// }
-
-// Fixed API Client with JWT Token Handling
-// File: lib/src/core/services/api.dart
-
 import 'package:dio/dio.dart';
+
 import 'session.dart';
+import '../config/app_env.dart';
+import 'dart:async';
+import 'dart:convert';
+import '../../main.dart';
 
 class ApiClient {
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE',
-    defaultValue: 'http://10.0.2.2:4000/api', // Android emulator
-  );
+  static final String baseUrl = AppEnv.baseUrl;
+  static bool _isRefreshing = false;
+  static final List<Completer<String?>> _refreshCompleters = [];
 
   static final Dio _dio = Dio(
     BaseOptions(
@@ -462,143 +23,149 @@ class ApiClient {
     ),
   );
 
-  static bool _isRefreshing = false;
-  static List<Function> _requestsQueue = [];
-
   static void initialize() {
     // Request Interceptor - Add JWT token
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          // Normalize path: Ensure all local request paths are prefixed with /api
+          String path = options.path;
+          if (!path.startsWith('http://') &&
+              !path.startsWith('https://') &&
+              !path.startsWith('/api/') &&
+              !path.startsWith('api/') &&
+              path != '/api' &&
+              path != 'api') {
+            if (path.startsWith('/')) {
+              options.path = '/api$path';
+            } else {
+              options.path = '/api/$path';
+            }
+          } else if (path.startsWith('api/')) {
+            options.path = '/$path'; // Adds leading slash if missing
+          }
+
+          print('✈️ [API REQUEST] ${options.method} ${options.baseUrl}${options.path}');
+          if (options.data != null) {
+            print('Request Body: ${options.data}');
+          }
+
           // Skip token for auth endpoints
           if (options.path.contains('/auth/login') ||
               options.path.contains('/auth/register') ||
-              options.path.contains('/auth/google')) {
+              options.path.contains('/auth/google') ||
+              options.path.contains('/auth/refresh')) {
             return handler.next(options);
           }
 
           // Add access token to headers
           final token = await session.getAccessToken();
           if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
+            options.headers['Authorization'] = 'Bearer $token'; // Backend auth middleware expects Bearer token
           }
 
           return handler.next(options);
         },
         onError: (error, handler) async {
-          // Handle 401 errors (token expired)
+          print('❌ [API ERROR] ${error.response?.statusCode} ${error.requestOptions.path}');
+          print('Error Body: ${error.response?.data}');
+          print('Exception: $error');
+
           if (error.response?.statusCode == 401) {
-            if (!_isRefreshing) {
-              _isRefreshing = true;
+            // Skip refresh for auth endpoints themselves
+            final path = error.requestOptions.path;
+            if (path.contains('/auth/login') ||
+                path.contains('/auth/register') ||
+                path.contains('/auth/google') ||
+                path.contains('/auth/refresh')) {
+              return handler.next(error);
+            }
 
-              try {
-                // Try to refresh token
-                await _refreshToken();
+            // Check if this request has already been retried
+            if (error.requestOptions.extra['retried'] == true) {
+              return handler.next(error);
+            }
 
-                // Retry original request
-                final opts = error.requestOptions;
-                final token = await session.getAccessToken();
-                opts.headers['Authorization'] = 'Bearer $token';
+            final refreshToken = await session.getRefreshToken();
+            if (refreshToken == null) {
+              await session.clear();
+              appRouter.go('/login');
+              return handler.next(error);
+            }
 
-                final response = await _dio.fetch(opts);
-                _isRefreshing = false;
-
-                // Process queued requests
-                _processQueue();
-
-                return handler.resolve(response);
-              } catch (e) {
-                _isRefreshing = false;
-
-                // Clear session and force logout
-                await session.clear();
-
-                // Process queued requests with error
-                _processQueue(error: error);
-
-                return handler.reject(error);
+            if (_isRefreshing) {
+              final completer = Completer<String?>();
+              _refreshCompleters.add(completer);
+              final token = await completer.future;
+              if (token != null) {
+                error.requestOptions.headers['Authorization'] = 'Bearer $token';
+                error.requestOptions.extra['retried'] = true;
+                try {
+                  final response = await _dio.fetch(error.requestOptions);
+                  return handler.resolve(response);
+                } on DioException catch (e) {
+                  return handler.next(e);
+                }
               }
-            } else {
-              // Queue this request while token is being refreshed
-              return _addToQueue(
-                () => handler.resolve(error.response!),
-                (err) => handler.reject(err),
+              return handler.next(error);
+            }
+
+            _isRefreshing = true;
+            try {
+              // Create a temporary Dio client for the refresh request to avoid interceptor loops
+              final refreshDio = Dio();
+              final response = await refreshDio.post(
+                '${AppEnv.baseUrl}/api/auth/refresh',
+                data: {'refreshToken': refreshToken},
               );
+
+              var responseData = response.data;
+              if (responseData is String) {
+                responseData = jsonDecode(responseData);
+              }
+              final newAccessToken = responseData['accessToken'] as String;
+              final newRefreshToken = responseData['refreshToken'] as String;
+
+              await session.setTokens(newAccessToken, newRefreshToken);
+
+              // Complete all pending requests in queue
+              for (var c in _refreshCompleters) {
+                c.complete(newAccessToken);
+              }
+              _refreshCompleters.clear();
+              _isRefreshing = false;
+
+              // Retry the original request
+              error.requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
+              error.requestOptions.extra['retried'] = true;
+              final retryResponse = await _dio.fetch(error.requestOptions);
+              return handler.resolve(retryResponse);
+            } catch (e) {
+              _isRefreshing = false;
+              for (var c in _refreshCompleters) {
+                c.complete(null);
+              }
+              _refreshCompleters.clear();
+
+              // Refresh failed - logout and redirect to login screen
+              await session.clear();
+              appRouter.go('/login');
+              return handler.next(error);
             }
           }
-
           return handler.next(error);
         },
         onResponse: (response, handler) {
-          // Log successful responses in debug mode
-          print(
-            '✅ API Response: ${response.requestOptions.path} - ${response.statusCode}',
-          );
+          print('✅ [API RESPONSE] ${response.statusCode} ${response.requestOptions.path}');
+          print('Response Body: ${response.data}');
           return handler.next(response);
-        },
+        }
       ),
     );
-
-    // Logging Interceptor (debug mode only)
-    _dio.interceptors.add(
-      LogInterceptor(
-        requestBody: true,
-        responseBody: true,
-        error: true,
-        logPrint: (obj) => print('🔍 API: $obj'),
-      ),
-    );
-  }
-
-  static Future<void> _refreshToken() async {
-    final refreshToken = await session.getRefreshToken();
-    if (refreshToken == null) {
-      throw Exception('No refresh token available');
-    }
-
-    final response = await _dio.post(
-      '/auth/refresh',
-      data: {'refreshToken': refreshToken},
-      options: Options(
-        headers: {}, // No auth header for refresh
-      ),
-    );
-
-    final data = response.data;
-    if (data['accessToken'] != null) {
-      await session.setAccessToken(data['accessToken']);
-    }
-    if (data['refreshToken'] != null) {
-      await session.setRefreshToken(data['refreshToken']);
-    }
-  }
-
-  static Future<void> _addToQueue(
-    Function onSuccess,
-    Function(DioException) onError,
-  ) async {
-    _requestsQueue.add(() async {
-      if (_isRefreshing) {
-        await onSuccess();
-      } else {
-        await onError(
-          DioException(
-            requestOptions: RequestOptions(path: ''),
-            error: 'Token refresh failed',
-          ),
-        );
-      }
-    });
-  }
-
-  static void _processQueue({DioException? error}) {
-    for (var request in _requestsQueue) {
-      request();
-    }
-    _requestsQueue.clear();
   }
 
   static Dio get instance => _dio;
+  static Dio get dio => _dio;
 }
 
 // Global dio instance

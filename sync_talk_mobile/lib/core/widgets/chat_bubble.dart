@@ -396,6 +396,7 @@ class ChatBubble extends StatelessWidget {
   final String status;
   final VoidCallback? onLongPress;
   final List<String>? reactions;
+  final Color? color;
 
   const ChatBubble({
     super.key,
@@ -405,13 +406,14 @@ class ChatBubble extends StatelessWidget {
     required this.status,
     this.onLongPress,
     this.reactions,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bubbleColor = isMine
+    final bubbleColor = color ?? (isMine
         ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-        : Colors.grey.shade300;
+        : Colors.grey.shade300);
 
     return GestureDetector(
       onLongPress: onLongPress,

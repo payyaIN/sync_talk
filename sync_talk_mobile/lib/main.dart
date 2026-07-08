@@ -208,27 +208,35 @@
 // Fixed Main Application Entry Point
 // File: lib/main.dart
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sync_talk_mobile/core/services/api.dart';
 import 'package:sync_talk_mobile/core/services/session.dart';
+import 'package:sync_talk_mobile/core/services/sockets.dart';
 import 'package:sync_talk_mobile/core/theme/app_theme.dart';
-import 'package:sync_talk_mobile/features/auth/presentation/login_screen.dart';
-import 'package:sync_talk_mobile/features/auth/presentation/register_screen.dart';
 import 'package:sync_talk_mobile/features/auth/view/login_screen.dart';
 import 'package:sync_talk_mobile/features/auth/view/register_screen.dart';
 import 'package:sync_talk_mobile/features/call/view/call_screen.dart';
 import 'package:sync_talk_mobile/features/chat/presentation/chat_screen.dart';
-import 'package:sync_talk_mobile/features/chat/presentation/home_screen.dart';
 import 'package:sync_talk_mobile/features/home/presentation/home_screen.dart';
 import 'package:sync_talk_mobile/features/profile/presentation/profile_screen.dart';
+import 'package:sync_talk_mobile/features/ai/presentation/ai_screen.dart';
+
+class StateLogger extends ProviderObserver {
+  const StateLogger();
+  @override
+  void didUpdateProvider(ProviderBase provider, Object? previousValue, Object? newValue, ProviderContainer container) {
+    print('🔄 [STATE CHANGE] provider: ${provider.name ?? provider.runtimeType}, value: $newValue');
+  }
+}
 
 void main() async {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp();
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -251,61 +259,69 @@ void main() async {
   await initSession();
   print('✅ Session initialized');
 
+  if (session.isLoggedInSync && session.userId != null) {
+    sockets.connect(userId: session.userId!);
+  }
+
   initApi();
   print('✅ API client initialized');
 
   // Run the app
-  runApp(const ProviderScope(child: SyncTalkApp()));
+  runApp(const ProviderScope(observers: [StateLogger()], child: SyncTalkApp()));
 }
+
+final GoRouter appRouter = GoRouter(
+  initialLocation: '/login',
+  routes: [
+    GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+    GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
+    GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
+    GoRoute(
+      path: '/chat/:id',
+      builder: (ctx, st) {
+        final conversationId = st.pathParameters['id']!;
+        return ChatScreen(conversationId: conversationId);
+      },
+    ),
+    GoRoute(
+      path: '/call/:id',
+      builder: (ctx, st) {
+        final conversationId = st.pathParameters['id']!;
+        return CallScreen(conversationId: conversationId);
+      },
+    ),
+    GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+    GoRoute(path: '/ai', builder: (_, __) => const AiScreen()),
+  ],
+  // Optional: Add navigation guard for authentication
+  redirect: (context, state) async {
+    final isLoggedIn = await session.isLoggedIn();
+    final isAuthRoute =
+        state.matchedLocation == '/login' ||
+        state.matchedLocation == '/register';
+
+    // If not logged in and trying to access protected route
+    if (!isLoggedIn && !isAuthRoute) {
+      return '/login';
+    }
+
+    // If logged in and trying to access auth route
+    if (isLoggedIn && isAuthRoute) {
+      return '/home';
+    }
+
+    return null; // No redirect needed
+  },
+);
+
+final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
 
 class SyncTalkApp extends ConsumerWidget {
   const SyncTalkApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = GoRouter(
-      initialLocation: '/login',
-      routes: [
-        GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
-        GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
-        GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
-        GoRoute(
-          path: '/chat/:id',
-          builder: (ctx, st) {
-            final conversationId = st.pathParameters['id']!;
-            return ChatScreen(conversationId: conversationId);
-          },
-        ),
-        GoRoute(
-          path: '/call/:id',
-          builder: (ctx, st) {
-            final conversationId = st.pathParameters['id']!;
-            return CallScreen(conversationId: conversationId);
-          },
-        ),
-        GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
-      ],
-      // Optional: Add navigation guard for authentication
-      redirect: (context, state) async {
-        final isLoggedIn = await session.isLoggedIn();
-        final isAuthRoute =
-            state.matchedLocation == '/login' ||
-            state.matchedLocation == '/register';
-
-        // If not logged in and trying to access protected route
-        if (!isLoggedIn && !isAuthRoute) {
-          return '/login';
-        }
-
-        // If logged in and trying to access auth route
-        if (isLoggedIn && isAuthRoute) {
-          return '/home';
-        }
-
-        return null; // No redirect needed
-      },
-    );
-
+    final themeMode = ref.watch(themeModeProvider);
     return MaterialApp.router(
       title: 'SyncTalk',
       debugShowCheckedModeBanner: false,
@@ -313,10 +329,10 @@ class SyncTalkApp extends ConsumerWidget {
       // Modern theme
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
 
       // Router configuration
-      routerConfig: router,
+      routerConfig: appRouter,
     );
   }
 }

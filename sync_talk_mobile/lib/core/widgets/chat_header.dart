@@ -114,14 +114,23 @@ import 'package:flutter/material.dart';
 class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String? subtitle;
+  final String? avatarUrl;
   final VoidCallback? onInfoTap;
 
   const ChatHeader({
     super.key,
     required this.title,
     this.subtitle,
+    this.avatarUrl,
     this.onInfoTap,
   });
+
+  String _getInitials(String name) {
+    if (name.isEmpty) return "?";
+    final parts = name.trim().split(" ").where((e) => e.isNotEmpty).toList();
+    if (parts.isEmpty) return "?";
+    return parts.map((e) => e[0]).take(2).join().toUpperCase();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +138,16 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
       titleSpacing: 0,
       title: Row(
         children: [
-          const CircleAvatar(radius: 18, child: Icon(Icons.person)),
+          CircleAvatar(
+            radius: 18,
+            backgroundImage: avatarUrl != null && avatarUrl!.isNotEmpty ? NetworkImage(avatarUrl!) : null,
+            child: avatarUrl == null || avatarUrl!.isEmpty
+                ? Text(
+                    _getInitials(title),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  )
+                : null,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -142,10 +160,10 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if (subtitle != null)
+                if (subtitle != null && subtitle!.isNotEmpty)
                   Text(
                     subtitle!,
-                    style: const TextStyle(fontSize: 13, color: Colors.grey),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
               ],
             ),

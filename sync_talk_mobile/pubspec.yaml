@@ -60,6 +60,8 @@ dependencies:
   flutter_svg: ^2.2.1
   firebase_auth: ^5.7.0
 
+  path: any
+  intl: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

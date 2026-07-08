@@ -11,5 +11,6 @@ export const config = {
   },
   googleClientId: process.env.GOOGLE_CLIENT_ID,
   uploadDir: process.env.UPLOAD_DIR || 'uploads',
-  openAiKey: process.env.OPENAI_API_KEY
+  openAiKey: process.env.OPENAI_API_KEY,
+  geminiApiKey: process.env.GEMINI_API_KEY
 };

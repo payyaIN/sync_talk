@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import '../../../core/services/api.dart';
 
 class AiRepo {

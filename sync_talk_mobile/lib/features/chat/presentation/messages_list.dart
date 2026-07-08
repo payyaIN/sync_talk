@@ -21,26 +21,30 @@ class MessagesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      reverse: false,
+      reverse: true,
       itemCount: messages.length + (isTyping ? 1 : 0),
       itemBuilder: (context, index) {
-        if (isTyping && index == messages.length) {
+        if (isTyping && index == 0) {
           return const Padding(
-            padding: EdgeInsets.only(left: 8),
-            child: TypingIndicator(),
+            padding: EdgeInsets.only(left: 16, bottom: 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: TypingIndicator(),
+            ),
           );
         }
 
-        final message = messages[index];
+        final messageIndex = isTyping ? index - 1 : index;
+        final message = messages[messageIndex];
         final isMine = message['sender'] == myId;
-        final createdAt = DateTime.parse(message["createdAt"]);
+        final createdAt = DateTime.parse(message["createdAt"] ?? DateTime.now().toIso8601String());
 
         // Insert date separator
         bool showDateHeader = false;
-        if (index == 0)
+        if (messageIndex == messages.length - 1) {
           showDateHeader = true;
-        else {
-          final prev = DateTime.parse(messages[index - 1]["createdAt"]);
+        } else {
+          final prev = DateTime.parse(messages[messageIndex + 1]["createdAt"] ?? DateTime.now().toIso8601String());
           if (_isDifferentDay(prev, createdAt)) {
             showDateHeader = true;
           }
@@ -59,7 +63,7 @@ class MessagesList extends StatelessWidget {
                 ),
               ),
             ChatBubble(
-              message: message["message"] ?? "",
+              message: message["content"] ?? message["message"] ?? "",
               isMine: isMine,
               time:
                   "${createdAt.hour}:${createdAt.minute.toString().padLeft(2, '0')}",

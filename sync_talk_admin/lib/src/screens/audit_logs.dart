@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import '../api.dart';
+import '../theme.dart';
 
 class AuditLogsScreen extends StatefulWidget {
   const AuditLogsScreen({super.key});
@@ -25,10 +26,23 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Audit Logs')),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            const Icon(Icons.history, color: AdminTheme.primaryBlue),
+            const SizedBox(width: 12),
+            Text('Audit Logs', style: Theme.of(context).textTheme.headlineMedium),
+          ],
+        ),
+      ),
       body: loading ? const Center(child: CircularProgressIndicator()) : Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: DataTable2(
+        padding: const EdgeInsets.all(24.0),
+        child: Container(
+          decoration: AdminTheme.glassDecoration,
+          child: DataTable2(
+            headingRowColor: MaterialStateProperty.all(Colors.white.withOpacity(0.05)),
+            columnSpacing: 12,
+            horizontalMargin: 12,
           columns: const [
             DataColumn2(label: Text('Time')),
             DataColumn2(label: Text('Actor')),
@@ -41,6 +55,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> {
             DataCell(Text(a['action'] ?? '')),
             DataCell(Text(a['target'] ?? '')),
           ])).toList(),
+          ),
         ),
       ),
     );

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../api.dart';
+import '../theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,16 +18,28 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 380),
-          child: Card(
-            margin: const EdgeInsets.all(24),
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0F172A), Color(0xFF1E1B4B)],
+          ),
+        ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Container(
+              padding: const EdgeInsets.all(32),
+              margin: const EdgeInsets.all(24),
+              decoration: AdminTheme.glassDecoration,
               child: Column(mainAxisSize: MainAxisSize.min, children: [
-                const Text('SyncTalk Admin', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
+                const Icon(Icons.admin_panel_settings, size: 64, color: AdminTheme.primaryBlue),
+                const SizedBox(height: 16),
+                Text('SyncTalk Admin', style: Theme.of(context).textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text('Sign in to continue', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AdminTheme.textSecondary)),
+                const SizedBox(height: 32),
                 TextField(controller: email, decoration: const InputDecoration(labelText: 'Email')),
                 const SizedBox(height: 8),
                 TextField(controller: password, decoration: const InputDecoration(labelText: 'Password'), obscureText: true),
@@ -34,17 +47,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: loading ? null : () async {
-                    setState(()=>{loading=true,error=null});
+                    setState(() { loading=true; error=null; });
                     try {
                       final resp = await api.post('/api/auth/login', data: {'email': email.text.trim(), 'password': password.text.trim()});
                       api.setToken(resp.data['accessToken']);
-                      if (mounted) context.go('/dashboard');
+                      if (!context.mounted) return;
+                      context.go('/dashboard');
                     } catch (e) {
-                      setState(()=> error = 'Login failed');
+                      setState(() => error = 'Login failed');
                     }
-                    setState(()=>loading=false);
+                    setState(() => loading=false);
                   },
-                  child: Text(loading ? '...' : 'Login'),
+                  child: SizedBox(width: double.infinity, child: Text(loading ? 'Please wait...' : 'Login', textAlign: TextAlign.center)),
                 ),
               ]),
             ),

@@ -30,8 +30,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
     try {
       final payload = <String, dynamic>{};
-      if (displayName.text.trim().isNotEmpty)
+      if (displayName.text.trim().isNotEmpty) {
         payload['displayName'] = displayName.text.trim();
+      }
       payload['avatarUrl'] = avatarUrl.text.trim();
       await dio.post('/api/users/me', data: payload);
       setState(() {

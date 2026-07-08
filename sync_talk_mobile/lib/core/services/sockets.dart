@@ -1,24 +1,29 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'session.dart';
 import 'dart:async';
+import '../config/app_env.dart';
 
 class Sockets {
   IO.Socket? presence;
   final _online = <String>{};
   final _onlineCtrl = StreamController<Set<String>>.broadcast();
   Stream<Set<String>> get onlineStream => _onlineCtrl.stream;
-  IO.Socket? chat;
+  Set<String> get onlineUsers => _online;
 
   void connect({
     required String userId,
-    String base = 'http://192.168.1.8:4000',
+    String? base,
   }) {
+    if (presence != null && presence!.connected) return;
+
+    final baseUrl = base ?? AppEnv.baseUrl;
     presence = IO.io(
-      '$base/presence',
-      IO.OptionBuilder().setTransports(['websocket']).setAuth({
-        'userId': userId,
-      }).build(),
+      '$baseUrl/presence',
+      IO.OptionBuilder()
+          .setTransports(['websocket'])
+          .setAuth({'userId': userId})
+          .build(),
     );
+
     presence!.on('online', (d) {
       final id = d['userId']?.toString();
       if (id != null) {
@@ -26,6 +31,7 @@ class Sockets {
         _onlineCtrl.add(Set.of(_online));
       }
     });
+
     presence!.on('offline', (d) {
       final id = d['userId']?.toString();
       if (id != null) {
@@ -33,14 +39,13 @@ class Sockets {
         _onlineCtrl.add(Set.of(_online));
       }
     });
-    chat = IO.io(
-      '$base/chat',
-      IO.OptionBuilder().setTransports(['websocket']).build(),
-    );
+
+    presence!.connect();
   }
 
-  void joinConversation(String conversationId) {
-    chat?.emit('room:join', conversationId);
+  void disconnect() {
+    presence?.disconnect();
+    presence = null;
   }
 }
 

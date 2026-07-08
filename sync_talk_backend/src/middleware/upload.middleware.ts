@@ -11,7 +11,7 @@ import cloudinary from "../config/cloudinary";
 // });
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: async (req, file) => {
+  params: async (req: any, file: any) => {
     return {
       folder: "synctalk",
       resource_type: "auto" as const,
