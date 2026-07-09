@@ -16,7 +16,6 @@ coverage/
 # -----------------------
 # Flutter / Dart ignores
 # -----------------------
-**/build/
 **/.dart_tool/
 **/.packages
 **/pubspec.lock
