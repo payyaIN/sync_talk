@@ -13,12 +13,13 @@ class AppEnv {
 
   /// true  → use deployed cloud backend (for APK / portfolio builds)
   /// false → use local backend (for dev with USB + adb reverse)
-  static const bool _useProduction = false;
+  static const bool _useProduction = true;
 
   // ─── PRODUCTION (Cloud-deployed backend) ─────────────────────────────────────
   /// Your deployed backend URL — e.g. https://synctalk-api.onrender.com
   /// Leave empty until you deploy; the app will fall back to LAN IP.
-  static const String _productionUrl = ''; // ← set after deploying
+  static const String _productionUrl =
+      'https://sync-talk-backend-4ubc.onrender.com'; // ← set after deploying
 
   // ─── LOCAL DEVELOPMENT ───────────────────────────────────────────────────────
   /// For dev: ADB reverse (USB) uses localhost.

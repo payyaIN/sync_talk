@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,8 +10,15 @@ import 'src/theme.dart';
 class StateLogger extends ProviderObserver {
   const StateLogger();
   @override
-  void didUpdateProvider(ProviderBase provider, Object? previousValue, Object? newValue, ProviderContainer container) {
-    print('🔄 [STATE CHANGE] provider: ${provider.name ?? provider.runtimeType}, value: $newValue');
+  void didUpdateProvider(
+    ProviderBase provider,
+    Object? previousValue,
+    Object? newValue,
+    ProviderContainer container,
+  ) {
+    print(
+      '🔄 [STATE CHANGE] provider: ${provider.name ?? provider.runtimeType}, value: $newValue',
+    );
   }
 }
 
@@ -27,17 +33,25 @@ class AdminApp extends StatelessWidget {
     final router = GoRouter(
       initialLocation: '/login',
       routes: [
-        GoRoute(path: '/moderation', builder: (_, __) => const MessagesModerationScreen()),
+        GoRoute(
+          path: '/moderation',
+          builder: (_, __) => const MessagesModerationScreen(),
+        ),
         GoRoute(path: '/audit', builder: (_, __) => const AuditLogsScreen()),
         GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
-        GoRoute(path: '/dashboard', builder: (_, __) => const DashboardScreen()),
+        GoRoute(
+          path: '/dashboard',
+          builder: (_, __) => const DashboardScreen(),
+        ),
       ],
     );
+
     return MaterialApp.router(
       title: 'SyncTalk Admin',
       theme: AdminTheme.darkTheme,
       darkTheme: AdminTheme.darkTheme,
       themeMode: ThemeMode.dark,
+      debugShowCheckedModeBanner: false,
       routerConfig: router,
     );
   }

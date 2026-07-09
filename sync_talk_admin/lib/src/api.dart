@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 class Api {
   final Dio dio;
   Api._internal(this.dio);
-  static final Api _instance = Api._internal(Dio(BaseOptions(baseUrl: const String.fromEnvironment('API_BASE', defaultValue: 'http://localhost:8000'))));
+  static final Api _instance = Api._internal(Dio(BaseOptions(baseUrl: const String.fromEnvironment('API_BASE', defaultValue: 'https://sync-talk-backend-4ubc.onrender.com'))));
   factory Api() => _instance;
 
   void setToken(String? token) { dio.options.headers['Authorization'] = token != null ? 'Bearer $token' : null; }

@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     setState(() { loading=true; error=null; });
                     try {
                       final resp = await api.post('/api/auth/login', data: {'email': email.text.trim(), 'password': password.text.trim()});
-                      api.setToken(resp.data['accessToken']);
+                      api.setToken(resp.data['token'] ?? resp.data['accessToken']);
                       if (!context.mounted) return;
                       context.go('/dashboard');
                     } catch (e) {
