@@ -23,7 +23,6 @@ coverage/
 **/ios/Flutter/.symlinks/
 **/ios/Pods/
 **/android/.gradle/
-**/android/app/build/
 **/android/local.properties
 **/.flutter-plugins
 **/.flutter-plugins-dependencies
@@ -42,7 +41,6 @@ postman/
 
 sync_talk_mobile/build/
 # Flutter / Android builds
-**/build/
 .android/
 .gradle/
 *.iml
