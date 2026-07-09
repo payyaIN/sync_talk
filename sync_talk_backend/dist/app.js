@@ -1,0 +1,47 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createApp = createApp;
+const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
+const helmet_1 = __importDefault(require("helmet"));
+const morgan_1 = __importDefault(require("morgan"));
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
+const path_1 = __importDefault(require("path"));
+const auth_routes_js_1 = require("./modules/auth/auth.routes.js");
+const users_routes_js_1 = require("./modules/users/users.routes.js");
+const conversations_routes_js_1 = require("./modules/conversations/conversations.routes.js");
+const messages_routes_js_1 = require("./modules/messages/messages.routes.js");
+const uploads_routes_js_1 = require("./modules/uploads/uploads.routes.js");
+const status_routes_js_1 = require("./modules/statuses/status.routes.js");
+const call_routes_js_1 = require("./modules/calls/call.routes.js");
+const ai_routes_js_1 = require("./modules/ai/ai.routes.js");
+const audit_routes_js_1 = require("./modules/audit/audit.routes.js");
+const swagger_js_1 = require("./swagger.js");
+const env_js_1 = require("./config/env.js");
+const errorHandler_1 = require("./middleware/errorHandler");
+function createApp() {
+    const app = (0, express_1.default)();
+    app.use((0, cors_1.default)());
+    app.use((0, helmet_1.default)());
+    app.use((0, morgan_1.default)('dev'));
+    app.use(express_1.default.json({ limit: '5mb' }));
+    app.use((0, express_rate_limit_1.default)({ windowMs: 60000, max: 300 }));
+    app.get('/health', (_req, res) => res.json({ ok: true }));
+    app.use('/api/auth', auth_routes_js_1.authRouter);
+    app.use('/api/users', users_routes_js_1.usersRouter);
+    app.use('/api/conversations', conversations_routes_js_1.conversationsRouter);
+    app.use('/api/messages', messages_routes_js_1.messagesRouter);
+    app.use('/api/uploads', uploads_routes_js_1.uploadsRouter);
+    app.use('/api/status', status_routes_js_1.statusRouter);
+    app.use('/api/calls', call_routes_js_1.callsRouter);
+    app.use('/api/ai', ai_routes_js_1.aiRouter);
+    app.use('/api/audit', audit_routes_js_1.auditRouter);
+    app.use('/api/docs', swagger_js_1.docsRouter);
+    // app.use("/upload", uploadRoutes);
+    app.use('/uploads', express_1.default.static(path_1.default.resolve(env_js_1.config.uploadDir)));
+    app.use(errorHandler_1.errorHandler);
+    return app;
+}

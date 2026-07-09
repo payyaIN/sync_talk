@@ -5,7 +5,6 @@
 Thumbs.db
 *.log
 node_modules/
-dist/
 .env
 .env.*
 *.iml
@@ -39,7 +38,6 @@ firebase.json
 # -----------------------
 # Postman / temp / uploads
 # -----------------------
-uploads/
 postman/
 
 sync_talk_mobile/build/

@@ -1,0 +1,17 @@
+"use strict";
+// import { Router } from "express";
+// import { banUser, muteUser } from "./actions.controller";
+// import { authMiddleware } from "../../middleware/auth.middleware";
+// import { adminOnly } from "../../middleware/admin.middleware";
+Object.defineProperty(exports, "__esModule", { value: true });
+// const router = Router();
+// router.post("/ban/:userId", authMiddleware, adminOnly, banUser);
+// router.post("/mute/:userId", authMiddleware, adminOnly, muteUser);
+// export default router;
+const express_1 = require("express");
+const actions_controller_1 = require("./actions.controller");
+const auth_1 = require("../../middleware/auth");
+const router = (0, express_1.Router)();
+router.post("/ban/:userId", auth_1.requireAuth, auth_1.requireAdmin, actions_controller_1.banUser);
+router.post("/mute/:userId", auth_1.requireAuth, auth_1.requireAdmin, actions_controller_1.muteUser);
+exports.default = router;
